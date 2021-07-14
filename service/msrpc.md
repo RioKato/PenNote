@@ -8,7 +8,7 @@
   * 詳細は[オペレーティング システムの既知のWindows識別子](https://docs.microsoft.com/ja-jp/troubleshoot/windows-server/identity/security-identifiers-in-windows)を参照
 * rpcにアクセス可能な権限を有する時、`lookupnames`でドメイン識別子を取得可能
 * `lookupsids`でSIDからユーザ名の取得が可能であるため、相対識別子の総当りを行うことで、該当のドメインのユーザを列挙可能
-* impacketのlookupsidsを利用可能
+* 上記の相対識別子の総当りを自動化したimpacketのlookupsidsを利用可能
 * HTB: Heist
 
   ```console
