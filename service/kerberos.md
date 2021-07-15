@@ -491,8 +491,6 @@
   [*] Saving ticket in new_user.ccache
   ```
 
-  
-
 # Others
 ---
 

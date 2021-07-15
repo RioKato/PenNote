@@ -64,8 +64,6 @@
   rpcclient $> ^C
   ```
 
-
-
 ## queryuser
 * queryuserを利用し、ユーザのパスワード設定時刻を取得可能
 * HTB: Active

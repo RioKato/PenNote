@@ -1,7 +1,7 @@
 # Attack
 ----
 
-# cpassword
+## cpassword
 * **MS14-025以**前は、**SYSVOL**以下にグループポリシーファイルが配置されていた
 * 前記グループポリシーファイルには**cpassword**と呼ばれる、暗号化されたパスワードが保存されていることがあった
 * 暗号化されたパスワードは[gpp-decrypt](https://github.com/t0thkr1s/gpp-decrypt)で復号可能
