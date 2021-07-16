@@ -13,12 +13,12 @@
 * `ldapsearch`ではEオプションでNTSecurityDescriptorの取得が可能
 	* `ldapsearch -x -D tiffany.molina@intelligence.htb -w NewIntelligenceCorpUser9876 -h intelligence.htb -b 'dc=intelligence,dc=htb' -E '!1.2.840.113556.1.4.801=::MAMCAQQ=' `
 	* 詳細は[Ldap query to get the ACL](https://stackoverflow.com/questions/67371962/ldap-query-to-get-the-acl)を参照
-* [pywerview](https://github.com/the-useless-one/pywerview)のget-objectaclオプションで、NTSecurityDescriptorのACLをデコードした状態で取得可能
+* LDAPでは権限の継承に二種類の方法が存在
+    1. 親のディレクトリのACLを子のディレクトリが継承
+    1. 子ディレクトリがセキュリティグループのメンバ（`memberof`）である場合、小ディレクトリが前記セキュリティグループの権限を継承
+* リモート環境では[pywerview](https://github.com/the-useless-one/pywerview)のget-objectaclオプションで、ローカル環境ではPowerSploitのPowerViewのGet-ObjectACLで、NTSecurityDescriptorのACLをデコードした状態で取得可能
     * get-objectaclは2021年7月時点ではdevelopブランチでのみ利用可能
-* LDAPでは権限の継承に二種類の方法が存在する
-    1. 親のディレクトリのACLを子のディレクトリは継承する
-    1. 子ディレクトリがセキュリティグループのメンバ（`memberof`）である場合は、小ディレクトリは前記セキュリティグループの権限を継承する
-
+    
     | Name                  | Description          |
     | -------------------- | -------------------- |
     | securityidentifier    | 主体（誰が）         |
@@ -160,15 +160,20 @@
 
 ## Service Principal Name
 * servicePrincipalNameを有するユーザは脆弱である可能性がある
-* 詳細はKerberos - Kerberostingを参照
+* 詳細はKerberostingを参照
 
 ## Delegation
-* msDS-AllowedToDelegateTo、msDS-AllowedToActOnBehalfOfOtherIdentityが委任を示す
-* 詳細はKerberos - Delegation Attackを参照
+* msDS-AllowedToDelegateTo、msDS-AllowedToActOnBehalfOfOtherIdentityを有するユーザは脆弱である可能性がある
+* 詳細はDelegation Attackを参照
 
-## Rewrite DNS Record
+## Add DNS Record
 * ldapのエントリを書き換えることで、ldapを参照するDNSのエントリを書き換え可能
+* `AuthenticatedUsers`に属するユーザは任意のレコードを新規に追加可能（`create_child`）
+* ただし、自分が追加したものではないレコードの書き換えは禁止されている
+* 詳細は[Beyond LLMNR/NBNS Spoofing – Exploiting Active Directory-Integrated DNS](https://www.netspi.com/blog/technical/network-penetration-testing/exploiting-adidns/)を参照
+
 * [krbrelayx/dnstool](https://github.com/dirkjanm/krbrelayx)を利用可能
+
 * HTB: Intelligence
 
   ```console
@@ -181,3 +186,15 @@
   [+] LDAP operation completed successfully
   ```
 
+## Modify Service Principal Name
+* 権限を有する場合、ldapへのログインユーザは、自身に設定された`servicePrincipalName`および`msDS-AdditionalDNSHostName`を書き換え可能
+* 一般的にはdnstoolと併用されることが多い
+  1. SPNを架空のホストのサービスに書き換える（`servicePrincipalName: HOST\dammy.com`）
+  1. dnstoolを利用し架空のホストのIPアドレスに攻撃者の端末のIPアドレスを設定する（`dig dammy.com`）
+* [krbrelayx/addspn](https://github.com/dirkjanm/krbrelayx)を利用可能
+
+## Reference
+----
+
+* [“Relaying” Kerberos - Having fun with unconstrained delegation](https://dirkjanm.io/krbrelayx-unconstrained-delegation-abuse-toolkit/)
+* [No Shells Required - a Walkthrough on Using Impacket and Kerberos to Delegate Your Way to DA](http://blog.redxorblue.com/2019/12/no-shells-required-using-impacket-to.html)

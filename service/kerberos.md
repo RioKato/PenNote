@@ -235,11 +235,15 @@
   
   ```
 
-## Delegation Attack
-* 特定のアカウントから特定のサービスへの委任（Delegation）が許可されている時、任意のユーザに成りすまし（Impersonate）てTGSを取得可能
+## Unconstrained Delegation Attack
+* 特定のアカウントから特定のサービスへの制約のない委任が許可されている時、任意のユーザに成りすまし（Impersonate）てTGSを取得可能
 * Kerberos以外のプロトコル（NTLM他）に対応するために、S4U2Selfが任意のユーザのTGSを生成することが原因
-* msDS-AllowedToDelegateToが特定サービスへの委任を示す
+* msDS-AllowedToDelegateToが特定サービスへの制約のない委任を示す
+* 侵害したアカウントのSPNを書き換え可能な場合、[krbrelayx/krbrelayx](https://github.com/dirkjanm/krbrelayx)を利用し、TGTなどの取得が可能
+  * ドメインコントローラのTGTが取得できれば、DCSync Attackを実行可能
+  * 詳細は[“Relaying” Kerberos - Having fun with unconstrained delegation](https://dirkjanm.io/krbrelayx-unconstrained-delegation-abuse-toolkit/)を参照
 * 詳細は[Wagging the Dog: Abusing Resource-Based Constrained Delegation to Attack Active Directory](https://shenaniganslabs.io/2019/01/28/Wagging-the-Dog.html)を参照
+
 * HTB: Intelligence
 
   ```console
@@ -342,17 +346,16 @@
 
 ## DCSync
 * Active Directory間のntds.ditの同期機能を悪用し、ntds.ditを取得
-* 状況如何ではホスト側でユーザにDCSync権限（ExtendedRight）を付与する必要あり
+* 状況如何では侵入したホストでユーザにDCSync権限（ExtendedRight）の付与が必要
   * 詳細は[Abusing Active Directory Permissions with PowerView](http://www.harmj0y.net/blog/redteaming/abusing-active-directory-permissions-with-powerview/)を参照
 * なお、NTLMRelayxのescalate-userオプションでも、DCSync権限の付与が可能
-  * NTLMをldapへリレー
-  * 同一ホストでもホスト経由で実行は可能だが、前記のPowerShellを利用した手法で十分であるため、有効なユースケースは不明
+  * NTLMをldapへリレーし、ldapでユーザのDCSync権限を設定
   * 詳細は[Escalating privileges with ACLs in Active Directory](https://blog.fox-it.com/2018/04/26/escalating-privileges-with-acls-in-active-directory/)を参照
 * secretsdumpでntds.ditを取得
 * HTB: Forest
 
   ```console
-  Targetマシンで必要であればDCSync権限をユーザに付与
+  侵入したホストで必要であればDCSync権限をユーザに付与
   
   C:\Users\svc-alfresco\Documents> $pass = convertto-securestring "password" -asplain -force
   C:\Users\svc-alfresco\Documents> $cred = new-object system.management.automation.pscredential("htb\new_user", $pass)
@@ -545,3 +548,8 @@
   └──╼ $sudo date -s '2021-07-14T08:10:04 GMT'
   2021年  7月 14日 水曜日 17:10:04 JST
   ```
+
+## Reference
+----
+
+* [Penetration Testing Active Directory, Part II](https://hausec.com/2019/03/12/penetration-testing-active-directory-part-ii/)
