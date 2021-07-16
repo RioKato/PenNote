@@ -101,13 +101,13 @@
     1. 「コメントアウト記号」の挿入
           * `select * from users where username = 'admin' and password = ';--' limit 1`
           * SQL構文として正しくないため、エラーが発生する（エラーが観測できない場合も存在する）
-    1. エラーが発生しないような特殊記号の挿入
+    1. エラーが発生しないような「特殊記号」の挿入
           * `select * from users where username = 'admin' and password = '';--' limit 1`
           * SQL構文として正しいため、エラーは発生しない（ただし、ログインは失敗する）
     1. 「実現したい処理」の挿入
           * `select * from users where username = 'admin' and password = '' or 1 = 1;--' limit 1`
           * ログインに成功する
-  * [ffuf](https://github.com/ffuf/ffuf)を利用することで、ステップ２の自動化が可能
+  * [ffuf](https://github.com/ffuf/ffuf)を利用することで、「特殊記号」の挿入の自動化が可能
     * `ffuf -u http://example.com/test?param=FUZZ;-- -w ./SecLists/Fuzzing/special-chars.txt -mc all`
 * Blind SQL Injection
   * 「実現したい処理」は次のような処理になることが多い
