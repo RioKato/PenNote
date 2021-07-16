@@ -168,9 +168,7 @@
 
 ## Rewrite DNS Record
 * ldapのエントリを書き換えることで、ldapを参照するDNSのエントリを書き換え可能
-
 * [krbrelayx/dnstool](https://github.com/dirkjanm/krbrelayx)を利用可能
-
 * HTB: Intelligence
 
   ```console
