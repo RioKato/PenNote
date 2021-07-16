@@ -35,7 +35,6 @@
   * **ただし、objectClassが設定されていないユーザは列挙から漏れる懸念がある**
   * `ldapsearch -x -h forest.htb -b 'dc=htb,dc=local' 'objectClass=user'`も同様
   * **GetADUsersは漏れなく列挙可能なため、GetADUsersの利用が望ましい**
-  
 * HTB: Forest
 
   ```console
@@ -157,14 +156,6 @@
   └──╼ $python gMSADumper.py -d intelligence.htb -u ted.graves -p Mr.Teddy
   svc_int$:::d64b83fe606e6d3005e20ce0ee932fe2
   ```
-
-## Service Principal Name
-* servicePrincipalNameを有するユーザは脆弱である可能性がある
-* 詳細はKerberostingを参照
-
-## Delegation
-* msDS-AllowedToDelegateTo、msDS-AllowedToActOnBehalfOfOtherIdentityを有するユーザは脆弱である可能性がある
-* 詳細はDelegation Attackを参照
 
 ## Add DNS Record
 * ldapのエントリを書き換えることで、ldapを参照するDNSのエントリを書き換え可能
