@@ -2,11 +2,31 @@
 ----
 ## Basics
 * ldapsearchでldapから情報を取得可能
-* `ldapsearch -x -h intelligence.htb -s base`
-* `ldapsearch -x -h intelligence.htb -b dc=intelligence,dc=htb`
-* `ldapsearch -x -D ted.graves@intelligence.htb -w Mr.Teddy -h intelligence.htb  -b dc=intelligence,dc=htb`
-  * userPrincipalNameではなく、dnでもユーザを指定可能
-  * -D 'cn=ted graves,cn=users,dc=intelligence,dc=htb'
+  * `ldapsearch -x -h intelligence.htb -s base`
+  * `ldapsearch -x -h intelligence.htb -b dc=intelligence,dc=htb`
+  * `ldapsearch -x -D ted.graves@intelligence.htb -w Mr.Teddy -h intelligence.htb  -b dc=intelligence,dc=htb`
+    * userPrincipalNameではなく、dnでもユーザを指定可能
+    * -D 'cn=ted graves,cn=users,dc=intelligence,dc=htb'
+
+## Permission 
+* ldapから取得できるNTSecurityDescriptorにはACLの情報が含まれる
+* `ldapsearch`ではEオプションでNTSecurityDescriptorの取得が可能
+	* `ldapsearch -x -D tiffany.molina@intelligence.htb -w NewIntelligenceCorpUser9876 -h intelligence.htb -b 'dc=intelligence,dc=htb' -E '!1.2.840.113556.1.4.801=::MAMCAQQ=' `
+	* 詳細は[Ldap query to get the ACL](https://stackoverflow.com/questions/67371962/ldap-query-to-get-the-acl)を参照
+* [pywerview](https://github.com/the-useless-one/pywerview)のget-objectaclオプションで、NTSecurityDescriptorのACLをデコードした状態で取得可能
+    * get-objectaclは2021年7月時点ではdevelopブランチでのみ利用可能
+* LDAPでは権限の継承に二種類の方法が存在する
+    1. 親のディレクトリのACLを子のディレクトリは継承する
+    1. 子ディレクトリがセキュリティグループのメンバ（`memberof`）である場合は、小ディレクトリは前記セキュリティグループの権限を継承する
+
+    | Name                  | Description          |
+    | -------------------- | -------------------- |
+    | securityidentifier    | 主体（誰が）         |
+    | objectdn / objectsid  | 所属（何処の）       |
+    | objectacetype         | 対象（何に）         |
+    | activedirectoryrights | 動作（何を） |
+    | acetype | 許可/禁止する |
+    | isinherited | 上記のルールを親ディレクトリから継承した場合はTrue。定義元である場合はFalse |
 
 ## User Enumeration
 * ldapからユーザを列挙
@@ -162,5 +182,4 @@
   [-] Adding new record
   [+] LDAP operation completed successfully
   ```
-
 
