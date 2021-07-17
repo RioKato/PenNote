@@ -245,8 +245,8 @@
 
 ## Constrained Delegation Attack
 * 制約付き委任が許可されている時、任意のユーザに成りすまして**msDS-AllowedToDelegateTo**プロパティが示すサービスのTGSを取得可能
-  * リソースベースの制約付き委任が許可されている時は、任意のユーザに成りすまして**`msDS-AllowedToActOnBehalfOfOtherIdentity`**プロパティを有するサービスのTGSが取得可能
-  * サービスの**`msDS-AllowedToActOnBehalfOfOtherIdentity`**プロパティを攻撃者サーバに設定するために、ntlmrelayxのdelegate-accessオプションを利用可能
+  * リソースベースの制約付き委任が許可されている時は、任意のユーザに成りすまして**msDS-AllowedToActOnBehalfOfOtherIdentity**プロパティを有するサービスのTGSが取得可能
+  * サービスの**msDS-AllowedToActOnBehalfOfOtherIdentity**プロパティを攻撃者サーバに設定するために、ntlmrelayxのdelegate-accessオプションを利用可能
 * ldapのuserAccountControlプロパティに**TRUSTED_TO_AUTH_FOR_DELEGATION**フラグが設定されているアカウントが攻撃対象
   * 制約付き委任ではS4U2SelfおよびS4U2Proxyと呼ばれるKerberosプロトコル拡張のセットを利用
   * **TRUSTED_TO_AUTH_FOR_DELEGATION**フラグの設定により、S4U2Selfで任意のユーザに成りすましてTGSを取得する機能が有効化される
