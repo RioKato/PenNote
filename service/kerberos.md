@@ -245,6 +245,8 @@
 
 ## Constrained Delegation Attack
 * 制約付き委任が許可されている時、任意のユーザに成りすまして**msDS-AllowedToDelegateTo**プロパティが示すサービスのTGSを取得可能
+  * リソースベースの制約付き委任が許可されている時は、任意のユーザに成りすまして**`msDS-AllowedToActOnBehalfOfOtherIdentity`**プロパティを有するサービスのTGSが取得可能
+  * サービスの**`msDS-AllowedToActOnBehalfOfOtherIdentity`**プロパティを攻撃者サーバに設定するために、ntlmrelayxのdelegate-accessオプションを利用可能
 * ldapのuserAccountControlプロパティに**TRUSTED_TO_AUTH_FOR_DELEGATION**フラグが設定されているアカウントが攻撃対象
   * 制約付き委任ではS4U2SelfおよびS4U2Proxyと呼ばれるKerberosプロトコル拡張のセットを利用
   * **TRUSTED_TO_AUTH_FOR_DELEGATION**フラグの設定により、S4U2Selfで任意のユーザに成りすましてTGSを取得する機能が有効化される
@@ -406,7 +408,7 @@
 * 状況如何では侵入したホストでユーザにDCSync権限（ExtendedRight）の付与が必要
   * 詳細は[Abusing Active Directory Permissions with PowerView](http://www.harmj0y.net/blog/redteaming/abusing-active-directory-permissions-with-powerview/)を参照
 * なお、NTLMRelayxのescalate-userオプションでも、DCSync権限の付与が可能
-  * NTLMをldapへリレーし、ldapでユーザのDCSync権限を設定
+  * NTLMをldapへリレーし、ユーザのDCSync権限を設定
   * 詳細は[Escalating privileges with ACLs in Active Directory](https://blog.fox-it.com/2018/04/26/escalating-privileges-with-acls-in-active-directory/)を参照
 * secretsdumpでntds.ditを取得
 * HTB: Forest
