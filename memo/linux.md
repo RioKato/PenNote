@@ -63,6 +63,8 @@
     - search username
       - php may contains username
     - search password
+    - search sub domains
+    - search comments and hidden pages
   - cron job
     - /var/spool/cron/
     - check the permissions and timestamp of the file if the script creates a file.
