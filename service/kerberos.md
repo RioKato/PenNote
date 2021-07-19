@@ -408,7 +408,7 @@
 * 状況如何では侵入したホストでユーザにDCSync権限（ExtendedRight）の付与が必要
   * 詳細は[Abusing Active Directory Permissions with PowerView](http://www.harmj0y.net/blog/redteaming/abusing-active-directory-permissions-with-powerview/)を参照
 * なお、NTLMRelayxのescalate-userオプションでも、DCSync権限の付与が可能
-  * NTLMをldapへリレーし、ユーザのDCSync権限を設定
+  * NTLMをhttpからldapへリレーし、ユーザにDCSync権限を付与
   * 詳細は[Escalating privileges with ACLs in Active Directory](https://blog.fox-it.com/2018/04/26/escalating-privileges-with-acls-in-active-directory/)を参照
 * secretsdumpでntds.ditを取得
 * HTB: Forest
