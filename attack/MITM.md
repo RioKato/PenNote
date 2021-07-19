@@ -18,8 +18,8 @@
 | **HTTP**                 | 未確認 | OK   | OK     | OK     |
 | **RPC**                  | NG     | NG   | 未確認 | OK     |
 
-* SMBからLDAPへのNTLMリレーはCVE-2019-1040が存在すればntlmrelayxのdrop-micオプションで可能
-* ldapへのリレーを行う際はntlmrelayxのescalate-userオプションが
+* SMBからLDAPへのNTLMリレーはCVE-2019-1040が存在すればntlmrelayxのdrop-micオプションが利用可能
+* ldapへのリレーを行う際はntlmrelayxのescalate-userオプションでユーザの権限昇格が可能
 * [Relaying NTLM authentication over RPC](https://blog.compass-security.com/2020/05/relaying-ntlm-authentication-over-rpc/)
 
 ## Exploit
