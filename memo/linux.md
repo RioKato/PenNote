@@ -88,7 +88,7 @@
       - login, register, reset form in access.log
   - files
     - check timestamps, owner and group.
-      - alias ls='ls -la'
+      - alias ls='ls -la --time-style=iso'
     - directory without read permission but has write permission
   - SUID / SGID
     - export PATH=$MY_PATH:$PATH
