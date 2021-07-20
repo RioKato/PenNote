@@ -32,6 +32,8 @@
 - etc
 
   - exploit (normal)
+    - 見慣れないものを探す
+    - タイムスタンプに注目する
     - cms
       - copyright year
       - software version (CHANGELOG.txt ... etc)
