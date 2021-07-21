@@ -161,6 +161,11 @@
   - pwn
     - base address (No ASLR)
       - ldd bin
+    - aslr
+      - (disable) /proc/sys/kernel/randomize_va_space is 0
+      - ldd libc.so.6
+      - ldd binary
+      - 32bitの場合、アドレスが合致するまで施行するのも視野に入れる
   - wordlist
     - cewl
     - [username-anarchy](https://github.com/urbanadventurer/username-anarchy)
