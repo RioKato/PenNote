@@ -161,6 +161,7 @@
   - pwn
     - base address (No ASLR)
       - ldd bin
+      - ただし、lddで出力されるアドレスが正しくない時があるので注意
     - aslr
       - (disable) /proc/sys/kernel/randomize_va_space is 0
       - ldd libc.so.6

@@ -1,0 +1,58 @@
+# IPv6
+----
+
+## Enum
+* IPv4でポートが開放されていなくとも、IPv6のポートは開放されている場合がある
+* IPv4のアドレスのみ判明している場合、snmpなどを用いてIPv6のアドレスをリークする必要がある
+  Htb: Sneaky
+
+  ```console
+  ┌─[rio@parrot]─[~/Htb/Sneaky]
+  └──╼ $nmap -6 -A -oN quick6.nmap 'dead:beef:0000:0000:0250:56ff:feb9:3d5f'
+  Starting Nmap 7.91 ( https://nmap.org ) at 2021-07-26 14:50 JST
+  Nmap scan report for dead:beef::250:56ff:feb9:3d5f
+  Host is up (0.52s latency).
+  Not shown: 998 closed ports
+  PORT   STATE SERVICE VERSION
+  22/tcp open  ssh     OpenSSH 6.6.1p1 Ubuntu 2ubuntu2.8 (Ubuntu Linux; protocol 2.0)
+  | ssh-hostkey:
+  |   1024 5d:5d:2a:97:85:a1:20:e2:26:e4:13:54:58:d6:a4:22 (DSA)
+  |   2048 a2:00:0e:99:0f:d3:ed:b0:19:d4:6b:a8:b1:93:d9:87 (RSA)
+  |   256 e3:29:c4:cb:87:98:df:99:6f:36:9f:31:50:e3:b9:42 (ECDSA)
+  |_  256 e6:85:a8:f8:62:67:f7:01:28:a1:aa:00:b5:60:f2:21 (ED25519)
+  80/tcp open  http    Apache httpd 2.4.7 ((Ubuntu))
+  |_http-server-header: Apache/2.4.7 (Ubuntu)
+  |_http-title: 400 Bad Request
+  Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+  
+  Host script results:
+  | address-info:
+  |   IPv6 EUI-64:
+  |     MAC address:
+  |       address: 00:50:56:b9:3d:5f
+  |_      manuf: VMware
+  
+  Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+  Nmap done: 1 IP address (1 host up) scanned in 76.81 seconds
+  ┌─[rio@parrot]─[~/Htb/Sneaky]
+  └──╼ $ssh -i id_rsa -6 thrasivoulos@dead:beef:0000:0000:0250:56ff:feb9:3d5f
+  Welcome to Ubuntu 14.04.5 LTS (GNU/Linux 4.4.0-75-generic i686)
+  
+   * Documentation:  https://help.ubuntu.com/
+  
+    System information as of Mon Jul 26 08:53:23 EEST 2021
+  
+    System load:  0.0                Processes:           163
+    Usage of /:   10.1% of 18.58GB   Users logged in:     0
+    Memory usage: 13%                IP address for eth0: 10.129.1.179
+    Swap usage:   0%
+  
+    Graph this data and manage this system at:
+      https://landscape.canonical.com/
+  
+  Your Hardware Enablement Stack (HWE) is supported until April 2019.
+  Last login: Mon Jul 26 08:53:24 2021 from dead:beef:4::11b9
+  thrasivoulos@Sneaky:~$
+  ```
+
+  
