@@ -28,6 +28,8 @@
       * http://example.com?XDEBUG_SESSION_START=xxx
       * X-Forwarded-For: 192.168.1.1
       * nc -l -v -p 9000
+    * preg_replace
+      * e option enables os command injection
 
 - etc
 
