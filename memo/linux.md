@@ -172,8 +172,9 @@
       - 32bitの場合、アドレスが合致するまで施行するのも視野に入れる
     - /bin/sh
       - 権限昇格においては大半の場合、system("/bin/sh")を実行することが目的となるが、/bin/shでなくともよい
-      - system('/tmp/hoge')のようなパスを指定し、/tmp/hogeに実行可能なシェルスクリプトを配置してもよい
-      - /bin/shに限らず、適当なパスがバイナリ中に存在すれば流用可能
+      - 例えばshでもよい
+      - system("/tmp/hoge")のようなパスを指定し、/tmp/hogeに実行可能なシェルスクリプトを配置してもよい
+      - PATHに適当に追加(Path Injection)し、system("hoo")でもよい
   - wordlist
     - cewl
     - [username-anarchy](https://github.com/urbanadventurer/username-anarchy)

