@@ -1,11 +1,19 @@
 # linux
 ----
-## SUID
-* rootで動作しているデーモンは、setuid関数で任意のユーザのプロセスを生成できる
+## Run As
+* rootで動作しているデーモンは、setuid関数およびexecuve関数で任意のユーザの子プロセスを生成しうる
 * 例えばそのようなデーモンにcronや、postfixがある。
-* 加えて、postfixのようにメール送信をトリガとして、別ユーザのプロセスが動作するケースでは、プロセス監視では前記別ユーザのプロセスを観測できない可能性がある
-* そのような場合、コンフィグファイルを閲覧し、判断しなければならない
+* postfixの場合、常駐しているプロセスはrootで動作するmasterプロセスおよび、postfixで動作する子プロセスである
+* しかし、メール送信をトリガとして、rootでもpostfixでもない、第三者のユーザの子プロセスが生成される可能性がある
+* メール送信などをトリガとして第三者のユーザの子プロセスが生成される場合、psなどのプロセス監視では前記第三者のユーザの子プロセスを見逃す懸念が高いため、コンフィグファイルをチェックする必要がある
   ```console
+  kyle@writer:/etc/postfix$ ps aux | grep postfix
+  root        2750  0.0  0.1  38036  4596 ?        Ss   Aug02   0:00 /usr/lib/postfix/sbin/master -w
+  postfix     2752  0.0  0.1  38500  6100 ?        S    Aug02   0:00 qmgr -l -t unix -u
+  postfix     2757  0.0  0.2  42100  9200 ?        S    Aug02   0:00 tlsmgr -l -t unix -u -c
+  postfix   282071  0.0  0.1  38304  6168 ?        S    10:36   0:00 pickup -l -t unix -u -c
+  kyle      282201  0.0  0.0   8160  2416 pts/1    R+   10:39   0:00 grep --color=auto postfix
+  
   kyle@writer:/etc/postfix$ cat master.cf | grep -v '#'
   smtp      inet  n       -       y       -       -       smtpd -o content_filter=dfilt:
   
