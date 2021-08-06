@@ -55,4 +55,5 @@
   thrasivoulos@Sneaky:~$
   ```
 
-  
+# Reverse Shell
+* IPv4のOUTPUTテーブルが制限されており、Reverse ShellのIPv4コネクションが確立できない時、IPv6のOUTPUTテーブルが制限されていなければ、Rverse ShellのIPv6のコネクションを確立することができる
