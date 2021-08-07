@@ -175,7 +175,7 @@ def read_task(shell, interval=1):
 if __name__ == '__main__':
     from argparse import ArgumentParser
     parser = ArgumentParser()
-    parser.add_argument('backdoor', help='/'.join(_BACKDOOR))
+    parser.add_argument('backdoor', choices=list(_BACKDOOR))
     parser.add_argument('url')
     parser.add_argument('-i', '--inpath', default='/tmp/in')
     parser.add_argument('-o', '--outpath', default='/tmp/out')
@@ -189,10 +189,7 @@ if __name__ == '__main__':
         environ['HTTP_PROXY'] = args.proxy
         environ['HTTPS_PROXY'] = args.proxy
 
-    if args.backdoor in _BACKDOOR:
-        backdoor = _BACKDOOR[args.backdoor](args.url)
-    else:
-        parser.error('the following arguments are invalid: backdoor')
+    backdoor = _BACKDOOR[args.backdoor](args.url)
 
     if args.shell:
         shell = Shell(backdoor, args.inpath, args.outpath)
