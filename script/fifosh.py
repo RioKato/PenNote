@@ -105,6 +105,10 @@ class Shell(Backdoor):
     def outpath(self):
         return self._outpath
 
+    @property
+    def url(self):
+        return self._backdoor.url
+
     def system(self, command):
         return self._backdoor.system(command)
 
