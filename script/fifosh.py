@@ -8,7 +8,6 @@ from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from threading import Thread
 from time import sleep
 from sys import stderr
-from os import environ, _exit
 
 disable_warnings(InsecureRequestWarning)
 
@@ -27,6 +26,7 @@ class Backdoor(metaclass=ABCMeta):
 _BACKDOOR = {}
 def backdoor(name):
     def _backdoor(clazz):
+        assert issubclass(clazz, Backdoor)
         _BACKDOOR[name] = clazz
         return clazz
     return _backdoor
@@ -162,7 +162,7 @@ def setup_task(shell):
     except Exception as e:
         print(f'SETUP_ERROR: {e}', file=stderr)
 
-def read_task(shell, interval=1):
+def read_task(shell, interval):
     while True:
         try:
             contents = shell.read()
@@ -174,6 +174,8 @@ def read_task(shell, interval=1):
 
 if __name__ == '__main__':
     from argparse import ArgumentParser
+    from os import environ
+
     parser = ArgumentParser()
     parser.add_argument('backdoor', choices=list(_BACKDOOR))
     parser.add_argument('url')
@@ -198,10 +200,12 @@ if __name__ == '__main__':
 
     if not args.skip:
         thread1 = Thread(target=setup_task, args=[shell])
+        thread1.setDaemon(True)
         thread1.start()
         sleep(2)
 
     thread2 = Thread(target=read_task, args=[shell, args.interval])
+    thread2.setDaemon(True)
     thread2.start()
 
     try:
@@ -212,5 +216,5 @@ if __name__ == '__main__':
             except Exception as e:
                 print(f'WRITE_ERROR: {e}', file=stderr)
     except KeyboardInterrupt:
-        _exit(1)
+        exit(1)
 
