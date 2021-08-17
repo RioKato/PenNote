@@ -89,10 +89,10 @@ class Bash(Shell):
 
 
 import requests
-from requests.packages.urllib3 import disable_warnings
-from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
-disable_warnings(InsecureRequestWarning)
+requests.packages.urllib3.disable_warnings(
+        requests.packages.urllib3.exceptions.InsecureRequestWarning
+)
 
 _BACKDOOR = {}
 def backdoor(name):
