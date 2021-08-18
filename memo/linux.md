@@ -138,6 +138,9 @@
   - ssti
     - jinja2
       - {{config.\_\_class\_\_.\_\_init\_\_.\_\_globals\_\_['os'].popen('code').read()}}
+  - deserialization
+    - node.jsで入力がJsonでも、node-deserializeモジュールを利用していれば、デシリアライズに起因するバグが存在する可能性がある
+    - nodejsshell.pyで、evalに基づくリバースシェルが可能
   - environ
     - LD_PRELOAD
     - PYTHONPATH
