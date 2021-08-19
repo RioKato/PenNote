@@ -41,4 +41,56 @@
   PS C:\Users\Public> 
   ```
 
+## Crash Dump 
+* Volatilityを利用
+* imageinfoでimageのprofileを特定する
+* 特定したprofileでhashdumpなどを実行
+* Htb: Silo
+
+  ```console
+  ┌─[rio@parrot]─[~/Htb/Silo]
+  └──╼ $vol.py -f SILO-20180105-221806.dmp imageinfo
+  Volatility Foundation Volatility Framework 2.6.1
+  INFO    : volatility.debug    : Determining profile based on KDBG search...
+  WARNING : volatility.debug    : Alignment of WindowsCrashDumpSpace64 is too small, plugins will be extremely slow
+  WARNING : volatility.debug    : Alignment of WindowsCrashDumpSpace64 is too small, plugins will be extremely slow
+  WARNING : volatility.debug    : Alignment of WindowsCrashDumpSpace64 is too small, plugins will be extremely slow
+  WARNING : volatility.debug    : Alignment of WindowsCrashDumpSpace64 is too small, plugins will be extremely slow
+  WARNING : volatility.debug    : Alignment of WindowsCrashDumpSpace64 is too small, plugins will be extremely slow
+  WARNING : volatility.debug    : Alignment of WindowsCrashDumpSpace64 is too small, plugins will be extremely slow
+  WARNING : volatility.debug    : Alignment of WindowsCrashDumpSpace64 is too small, plugins will be extremely slow
+  WARNING : volatility.debug    : Alignment of WindowsCrashDumpSpace64 is too small, plugins will be extremely slow
+  WARNING : volatility.debug    : Alignment of WindowsCrashDumpSpace64 is too small, plugins will be extremely slow
+  WARNING : volatility.debug    : Alignment of WindowsCrashDumpSpace64 is too small, plugins will be extremely slow
+  WARNING : volatility.debug    : Alignment of WindowsCrashDumpSpace64 is too small, plugins will be extremely slow
+  WARNING : volatility.debug    : Alignment of WindowsCrashDumpSpace64 is too small, plugins will be extremely slow
+  WARNING : volatility.debug    : Alignment of WindowsCrashDumpSpace64 is too small, plugins will be extremely slow
+  WARNING : volatility.debug    : Alignment of WindowsCrashDumpSpace64 is too small, plugins will be extremely slow
+  WARNING : volatility.debug    : Alignment of WindowsCrashDumpSpace64 is too small, plugins will be extremely slow
+  WARNING : volatility.debug    : Alignment of WindowsCrashDumpSpace64 is too small, plugins will be extremely slow
+  WARNING : volatility.debug    : Alignment of WindowsCrashDumpSpace64 is too small, plugins will be extremely slow
+  WARNING : volatility.debug    : Alignment of WindowsCrashDumpSpace64 is too small, plugins will be extremely slow
+            Suggested Profile(s) : Win2016x64_14393, Win8SP0x64, Win10x64_17134, Win81U1x64, Win10x64_10240_17770, Win10x64_18362, Win10x64_14393, Win10x64, Win2012R2x64_18340, Win10x64_16299, Win2012R2x64, Win10x64_19041, Win2012x64, Win10x64_17763, Win8SP1x64_18340, Win10x64_10586, Win8SP1x64, Win10x64_15063 (Instantiated with Win10x64_15063)
+                       AS Layer1 : SkipDuplicatesAMD64PagedMemory (Kernel AS)
+                       AS Layer2 : WindowsCrashDumpSpace64 (Unnamed AS)
+                       AS Layer3 : FileAddressSpace (/home/rio/Htb/Silo/SILO-20180105-221806.dmp)
+                        PAE type : No PAE
+                             DTB : 0x1a7000L
+                            KDBG : 0xf80078520a30L
+            Number of Processors : 2
+       Image Type (Service Pack) : 0
+                  KPCR for CPU 0 : 0xfffff8007857b000L
+                  KPCR for CPU 1 : 0xffffd000207e8000L
+               KUSER_SHARED_DATA : 0xfffff78000000000L
+             Image date and time : 2018-01-05 22:18:07 UTC+0000
+       Image local date and time : 2018-01-05 22:18:07 +0000
+  
+  ┌─[✗]─[rio@parrot]─[~/Htb/Silo]
+  └──╼ $vol.py -f SILO-20180105-221806.dmp --profile Win2012R2x64 hashdump
+  Volatility Foundation Volatility Framework 2.6.1
+  Administrator:500:aad3b435b51404eeaad3b435b51404ee:9e730375b7cbcebf74ae46481e07b0c7:::
+  Guest:501:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
+  Phineas:1002:aad3b435b51404eeaad3b435b51404ee:8eacdd67b77749e65d3b3d5c110b0969:::
+  ```
+
   
