@@ -30,6 +30,9 @@
       * nc -l -v -p 9000
     * preg_replace
       * e option enables os command injection
+    * phpinfo + LFI
+      * phpinfoにファイルをアップロードすると、アップロードファイルのファイル名が表示される
+      * アップロードファイルは表示後、すぐに削除されるが、レースコンディションでLFIでアップロードファイルを読み込むことが可能
 
 - etc
 
@@ -224,8 +227,9 @@
       - curl http://target/table_name/_count
     - dump all
       - curl http://target/table_name/_search?size=row_count
-
-
+  - vnc
+    - パスワードファイルを解読可能
+    - https://github.com/jeroennijhof/vncpwd
 
 # Tools
 
