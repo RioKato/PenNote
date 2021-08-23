@@ -41,7 +41,71 @@
   PS C:\Users\Public> 
   ```
 
+## Service
+
+* HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\SERVICEがサービス設定のレジストリ
+* HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\SERVICE\Securityがサービスに対するACLのレジストリ
+* | 権限 | 説明       |
+  | ---- | ---------- |
+  | DC   | ChangeConf |
+  | RP   | start      |
+  | WP   | stop       |
+* [Best practices and guidance for writers of service discretionary access control lists](https://support.microsoft.com/en-us/topic/3cf7240a-86ad-1fc3-bbb6-f468454981c4)
+
+  ```console
+  C:\WINDOWS\system32>reg query HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\ZSAService
+  
+  HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\ZSAService
+      Type    REG_DWORD    0x10
+      Start    REG_DWORD    0x2
+      ErrorControl    REG_DWORD    0x1
+      ImagePath    REG_EXPAND_SZ    "C:\Program Files (x86)\Zscaler\ZSAService\ZSAService.exe"
+      DisplayName    REG_SZ    ZSAService
+      WOW64    REG_DWORD    0x14c
+      ObjectName    REG_SZ    LocalSystem
+      description    REG_SZ    ZSAService
+      FailureActions    REG_BINARY    FFFFFFFF000000000000000001000000140000000100000000000000
+  
+  HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\ZSAService\Security
+  
+  C:\WINDOWS\system32>reg query HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\ZSAService\Security
+  
+  HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\ZSAService\Security
+      Security    REG_BINARY    01001480A0000000AC000000140000003000000002001C000100000002801400FF010F000101000000000001000000000200700005000000000014001000000001010000000000010000000000001400FD01020001010000000000051200000000001800FF010F0001020000000000052000000020020000000014008D010200010100000000000504000000000014008D010200010100000000000506000000010100000000000512000000010100000000000512000000
+  
+  
+  C:\WINDOWS\system32>sc query ZSAService
+  
+  SERVICE_NAME: ZSAService
+          TYPE               : 10  WIN32_OWN_PROCESS
+          STATE              : 4  RUNNING
+                                  (NOT_STOPPABLE, NOT_PAUSABLE, ACCEPTS_SHUTDOWN)
+          WIN32_EXIT_CODE    : 0  (0x0)
+          SERVICE_EXIT_CODE  : 0  (0x0)
+          CHECKPOINT         : 0x0
+          WAIT_HINT          : 0x0
+  
+  C:\WINDOWS\system32>sc qc ZSAService
+  [SC] QueryServiceConfig SUCCESS
+  
+  SERVICE_NAME: ZSAService
+          TYPE               : 10  WIN32_OWN_PROCESS
+          START_TYPE         : 2   AUTO_START
+          ERROR_CONTROL      : 1   NORMAL
+          BINARY_PATH_NAME   : "C:\Program Files (x86)\Zscaler\ZSAService\ZSAService.exe"
+          LOAD_ORDER_GROUP   :
+          TAG                : 0
+          DISPLAY_NAME       : ZSAService
+          DEPENDENCIES       :
+          SERVICE_START_NAME : LocalSystem
+  
+  C:\WINDOWS\system32>sc sdshow ZSAService
+  
+  D:(A;;RP;;;WD)(A;;CCLCSWRPWPDTLOCRRC;;;SY)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;BA)(A;;CCLCSWLOCRRC;;;IU)(A;;CCLCSWLOCRRC;;;SU)S:(AU;FA;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;WD)
+  ```
+
 ## Crash Dump 
+
 * Volatilityを利用
 * imageinfoでimageのprofileを特定する
 * 特定したprofileでhashdumpなどを実行
