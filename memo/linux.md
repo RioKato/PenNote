@@ -28,6 +28,7 @@
       * http://example.com?XDEBUG_SESSION_START=xxx
       * X-Forwarded-For: 192.168.1.1
       * nc -l -v -p 9000
+      * syn-ackに対しrstが戻ってきて、何故か接続できない時も、試行回数を多くすれば接続可能なケースがある
     * preg_replace
       * e option enables os command injection
     * phpinfo + LFI
@@ -129,6 +130,8 @@
       - プロキシなどが間に存在し、リバースシェルが利用できないシーンで活用可能
     - [fstatic compile nmap](https://github.com/andrew-d/static-binaries/blob/master/binaries/linux/x86_64/nmap)
       - 侵入したホストでnmapが必要になった時、使用する
+  - file transfer
+    - nginxの場合、webdavを可能とするにはdav_methods PUT;のように設定
   - fuzzing([ffuf](https://github.com/ffuf/ffuf))
   
     - ffuf -u http://example.com/test?param=FUZZ -w /opt/SecLists/Fuzzing/special-chars.txt -mc all
@@ -218,6 +221,24 @@
         - openssl pkcs12 -export -inkey client.key -in client.cer -out client.p12
   - hashcat
     - hashcat -a 0 -m hash_type hash.txt rockyou.txt
+    
+    - https://github.com/hashcat/hashcat-utils
+    
+    - IEEE802.3クラックなどにも使える
+    
+      ```console
+      ┌─[✗]─[rio@parrot]─[~/Htb/Olympus/hashcat-utils/src]
+      └──╼ $./cap2hccapx.bin ../../captured.cap  ../../captured.hccapx
+      Networks detected: 1
+      
+      [*] BSSID=f4:ec:38:ab:a8:a9 ESSID=Too_cl0se_to_th3_Sun (Length: 20)
+       --> STA=c0:ee:fb:df:fc:2a, Message Pair=0, Replay Counter=1
+       --> STA=c0:ee:fb:df:fc:2a, Message Pair=2, Replay Counter=1
+      
+      Written 2 WPA Handshakes to: ../../captured.hccapx
+      ```
+    
+      
   - vhd
     - 7z l image.vhd
   - elasticsearch
