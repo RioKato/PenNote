@@ -233,6 +233,11 @@
   - LFI
     - php://filter/convert.base64-encode/resource=file_name.php
     
+  - nmap
+  
+    - fast scan
+    - nmap -p- --max-retries=0 -T5 127.0.0.1
+  
   - openssl
     - client certificate
       - generate  the private key
