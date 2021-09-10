@@ -5,7 +5,7 @@
 ![Kerberos101](images/Kerberos101.png)
 
 * 事前認証はActive Directoryではデフォルトで有効
-* TGTはユーザのパスワードハッシュで暗号化される
+* TGTは、認証クライアントであるユーザアカウントのパスワードハッシュで暗号化される
 * サービスは必ずSPNでアカウントに紐付けられる。
 * サービスがユーザアカウントに紐付けられているTGSは、前記ユーザのパスワードハッシュで暗号化される
 * 詳細は[Kerberos (I): How does Kerberos work?](https://www.tarlogic.com/en/blog/how-kerberos-works/)を参照
