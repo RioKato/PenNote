@@ -13,7 +13,7 @@
 ## Unconstrained Delegation
 * [Kerberos (III): How does delegation work?](https://www.tarlogic.com/blog/kerberos-iii-how-does-delegation-work/)
 
-![Unconstrained](/home/rio/PenNote/service/images/Unconstrained.png)
+![Unconstrained](images/Unconstrained.png)
 
 * ポイントは、AP ServerZにUser1のTGTが送信される点
 * AP ServerZはドメインコントローラのUserZアカウントのSPNで指定されている
@@ -26,16 +26,16 @@
 
 ## Constrained Delegation
 * [Kerberos (III): How does delegation work?](https://www.tarlogic.com/blog/kerberos-iii-how-does-delegation-work/)
-* ![Constrained_S4U2Proxy](/home/rio/PenNote/service/images/Constrained_S4U2Proxy.png)
+* ![Constrained_S4U2Proxy](images/Constrained_S4U2Proxy.png)
 * S4U2Proxyのポイントは、ServiceZのUser1のTGSから、msDS-AllowedToDelegationToで指定されたServiceXのUser1のTGSを生成可能な点
 
-![Constrained_S4U2Self](/home/rio/PenNote/service/images/Constrained_S4U2Self.png)
+![Constrained_S4U2Self](images/Constrained_S4U2Self.png)
 
 * S4U2Selfのポイントは、UserZのTGTから、ServiceZの任意のユーザ(例ではUser1)のTGSを生成可能な点
 * したがって、ドメインコントローラのUserZアカウントを侵害することができれば、UserZのTGTを入手できるため、S4U2Seflを利用し、ServiceZの任意のユーザのTGSを入手できる
 * 更に、S4U2Proxyを利用し、ServiceZの任意のユーザ(例えばAdmin)のTGSから、msDS-AllowedToDelegationToで指定されたServiceXの任意のユーザのTGSを入手できる
 
-  ![Constrained_ServiceName](/home/rio/PenNote/service/images/Constrained_ServiceName.png)
+  ![Constrained_ServiceName](images/Constrained_ServiceName.png)
 
 * 更にはサービス名は、TGSのクリアテキストに記載されており、変更可能
   * ホスト名は変更できないことに注意
