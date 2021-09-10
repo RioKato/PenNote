@@ -1,12 +1,45 @@
 # Description
 ----
+## Basics
 
 ![Kerberos101](images/Kerberos101.png)
 
-* 事前認証はオプショナル。ただし、Active Directoryではデフォルトで有効
+* 事前認証はActive Directoryではデフォルトで有効
 * TGTはユーザのパスワードハッシュで暗号化される
-* サービスがユーザに紐付けられている場合、TGSは前記ユーザのパスワードハッシュで暗号化される
+* サービスは必ずSPNでアカウントに紐付けられる。
+* サービスがユーザアカウントに紐付けられているTGSは、前記ユーザのパスワードハッシュで暗号化される
 * 詳細は[Kerberos (I): How does Kerberos work?](https://www.tarlogic.com/en/blog/how-kerberos-works/)を参照
+
+## Unconstrained Delegation
+* [Kerberos (III): How does delegation work?](https://www.tarlogic.com/blog/kerberos-iii-how-does-delegation-work/)
+
+![Unconstrained](/home/rio/PenNote/service/images/Unconstrained.png)
+
+* ポイントは、AP ServerZにUser1のTGTが送信される点
+* AP ServerZはドメインコントローラのUserZアカウントのSPNで指定されている
+* UserZアカウントを侵害することができれば、SPNを書き換えることができる
+* すなわち、SPNを攻撃者サーバに変更することで、攻撃者サーバがAP ServerZになりすますことができる
+* したがって、攻撃者サーバではUser1のTGTを入手することが可能となる
+* また、PrintBugなどを利用すると、任意のユーザにAp ServerZ(になりすました攻撃者サーバ)との認証を行わせることができる
+* これにより、例えばAdminのTGTを入手することが可能となる
+
+
+## Constrained Delegation
+* [Kerberos (III): How does delegation work?](https://www.tarlogic.com/blog/kerberos-iii-how-does-delegation-work/)
+* ![Constrained_S4U2Proxy](/home/rio/PenNote/service/images/Constrained_S4U2Proxy.png)
+* S4U2Proxyのポイントは、ServiceZのUser1のTGSから、msDS-AllowedToDelegationToで指定されたServiceXのUser1のTGSを生成可能な点
+
+![Constrained_S4U2Self](/home/rio/PenNote/service/images/Constrained_S4U2Self.png)
+
+* S4U2Selfのポイントは、UserZのTGTから、ServiceZの任意のユーザ(例ではUser1)のTGSを生成可能な点
+* したがって、ドメインコントローラのUserZアカウントを侵害することができれば、UserZのTGTを入手できるため、S4U2Seflを利用し、ServiceZの任意のユーザのTGSを入手できる
+* 更に、S4U2Proxyを利用し、ServiceZの任意のユーザ(例えばAdmin)のTGSから、msDS-AllowedToDelegationToで指定されたServiceXの任意のユーザのTGSを入手できる
+
+  ![Constrained_ServiceName](/home/rio/PenNote/service/images/Constrained_ServiceName.png)
+
+* 更にはサービス名は、TGSのクリアテキストに記載されており、変更可能
+  * ホスト名は変更できないことに注意
+* したがって、msDS-AllowedToDelegationToで指定されたServiceXの任意のユーザのTGSから、msDS-AllowedToDelegationToで指定されたServiceXが稼働するホストの、任意のサービスの任意のユーザのTGSを入手できる
 
 # Attack
 ----
@@ -244,12 +277,9 @@
 * 詳細は[“Relaying” Kerberos - Having fun with unconstrained delegation](https://dirkjanm.io/krbrelayx-unconstrained-delegation-abuse-toolkit/)を参照
 
 ## Constrained Delegation Attack
-* 制約付き委任が許可されている時、任意のユーザに成りすまして**msDS-AllowedToDelegateTo**プロパティが示すサービスのTGSを取得可能
-  * リソースベースの制約付き委任が許可されている時は、任意のユーザに成りすまして**msDS-AllowedToActOnBehalfOfOtherIdentity**プロパティを有するサービスのTGSが取得可能
-  * サービスの**msDS-AllowedToActOnBehalfOfOtherIdentity**プロパティを攻撃者サーバに設定するために、ntlmrelayxのdelegate-accessオプションを利用可能
+* 制約付き委任が許可されている時、任意のユーザに成りすまして**msDS-AllowedToDelegateTo**が示すホストの任意のサービスのTGSを取得可能
+  * リソースベースの制約付き委任が許可されている時は、**msDS-AllowedToActOnBehalfOfOtherIdentity**プロパティを有するサービスが示すホストの任意のユーザかつ任意のサービスのTGSが取得可能
 * ldapのuserAccountControlプロパティに**TRUSTED_TO_AUTH_FOR_DELEGATION**フラグが設定されているアカウントが攻撃対象
-  * 制約付き委任ではS4U2SelfおよびS4U2Proxyと呼ばれるKerberosプロトコル拡張のセットを利用
-  * **TRUSTED_TO_AUTH_FOR_DELEGATION**フラグの設定により、S4U2Selfで任意のユーザに成りすましてTGSを取得する機能が有効化される
 * 詳細は[Wagging the Dog: Abusing Resource-Based Constrained Delegation to Attack Active Directory](https://shenaniganslabs.io/2019/01/28/Wagging-the-Dog.html)を参照
 * HTB: Intelligence
 
