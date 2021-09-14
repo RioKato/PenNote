@@ -140,6 +140,12 @@
       - ">&" redirect stdout, stderr to a socket, "0>&1" redirect stdin to stdout(a socket).
     - mkfifo /tmp/input; tail -f /tmp/input | bash 2>&1 > /tmp/output;
       - プロキシなどが間に存在し、リバースシェルが利用できないシーンで活用可能
+      
+      - 次のコマンドでポートが開放されているか、確認が可能
+      
+        ```consoel
+        echo > /dev/tcp/127.0.0.1/900 && echo UP || echo Down
+        ```
     - [fstatic compile nmap](https://github.com/andrew-d/static-binaries/blob/master/binaries/linux/x86_64/nmap)
       - 侵入したホストでnmapが必要になった時、使用する
     
