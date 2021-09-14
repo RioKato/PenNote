@@ -1,6 +1,17 @@
 # Windows
 ----
 
+## Account
+* Windowsのローカル管理者アカウントには、Administratorと、Administratorsグループに属するユーザの二種類が存在する
+* Administratorは特殊なアカウントで、通常、初期状態では無効化されている
+* AdministratorはUACによる制約を受けないが、Administratorsグループに属するユーザはUACによる制約を受ける、という違いがある
+* Administratorおよび、Administratorsグループに属するユーザは、SMBへの書き込み権限を有するため、psexecを利用したログインが可能である
+* またAdministratorより上位の権限を有するSystemが存在するが、これはWindowsがシステム管理に利用するためのアカウントであって、通常、ログインできない
+* Systemもまた、UACの制約を受けない
+* またMachine Accountと呼ばれるアカウントも存在し、コンピュータがドメインに参加する際は、Machine AccoountでコンピュータをDCに認証したのち、ユーザの認証が行われる
+* Machine AccountはSMBへの書き込み権限を有さないため、psexecを利用したログインはできない
+* ただし、DCのMachine AccountはDCSyncの権限を有するため、クレデンシャルの窃盗が可能である
+
 ## 32 Bit or 64 Bit Process
 * OSが32bitか、64bitか、シェルを実行しているプロセスが32bitか、64bitかチェック
 * Kernel Exploitによっては、WOW64リダイレクトのために、32bitプロセスでは動作しない可能性がある
