@@ -10,7 +10,7 @@
       alias /data/w3/images/;
   }
   ```
-* http://victim.com/location_dir../path-to-fileでアクセス可能
+* http(s)://victim.com/location_dir../path-to-fileでアクセス可能
 
 
 ## CVE-2019-11043(php-fpm)
