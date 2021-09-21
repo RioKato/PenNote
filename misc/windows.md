@@ -250,8 +250,10 @@
                   key_guid a96996a9-5aec-4f82-a145-68ee2de5ea3f
   ```
 
-  ## Tips
-  
+## Time
+* ユーザがパスワードを変更した時間は、net userのPassword last setから把握できる
+
+## Tips  
   | Command | 説明                       |
   | ------- | -------------------------- |
   | dir /q  | ファイルのオーナを表示する |

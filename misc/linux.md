@@ -71,3 +71,30 @@
   root@apocalyst:/root# id
   uid=0(root) gid=0(root) groups=0(root)
   ```
+
+## Time
+* マシンが作成された時間は、sshのssh_host*.keyから把握できる
+* Htb: TheNoteBook
+
+  ```console
+  www-data@thenotebook:/etc/ssh$ ls
+  total 596
+  drwxr-xr-x 96 root root   4096 Feb 24  2021 ..
+  drwxr-xr-x  2 root root   4096 Feb 12  2021 .
+  -rw-r--r--  1 root root   3275 Feb 12  2021 sshd_config
+  -rw-------  1 root root    411 Feb 12  2021 ssh_host_ed25519_key
+  -rw-r--r--  1 root root     98 Feb 12  2021 ssh_host_ed25519_key.pub
+  -rw-------  1 root root    227 Feb 12  2021 ssh_host_ecdsa_key
+  -rw-r--r--  1 root root    178 Feb 12  2021 ssh_host_ecdsa_key.pub
+  -rw-------  1 root root    668 Feb 12  2021 ssh_host_dsa_key
+  -rw-r--r--  1 root root    606 Feb 12  2021 ssh_host_dsa_key.pub
+  -rw-------  1 root root   1679 Feb 12  2021 ssh_host_rsa_key
+  -rw-r--r--  1 root root    398 Feb 12  2021 ssh_host_rsa_key.pub
+  -rw-r--r--  1 root root    338 Feb 12  2021 ssh_import_id
+  -rw-r--r--  1 root root 553122 Mar  4  2019 moduli
+  -rw-r--r--  1 root root   1580 Mar  4  2019 ssh_config
+  
+  www-data@thenotebook:/etc/ssh$ find / -newermt "2021-02-12" ! -newermt "2021-02-19"
+  ```
+
+  
