@@ -258,7 +258,9 @@
       - CER + private key => PKCS12
         - archive the key and crtificate.
         - openssl pkcs12 -export -inkey client.key -in client.cer -out client.p12
-    
+  - vhost
+    - 必ずgobusterに-vオプションをつけてすべて出力すること
+  
   - hashcat
     - hashcat -a 0 -m hash_type hash.txt rockyou.txt
     
