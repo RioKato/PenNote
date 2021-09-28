@@ -258,6 +258,7 @@
       - CER + private key => PKCS12
         - archive the key and crtificate.
         - openssl pkcs12 -export -inkey client.key -in client.cer -out client.p12
+    
   - vhost
     - 必ずgobusterに-vオプションをつけてすべて出力すること
   
@@ -299,6 +300,31 @@
       drwxr-xr-x root/root         0 2021-08-31 20:33 var/www/
       drwxr-xr-x root/root         0 2021-08-31 20:33 var/www/html/
       -rwsr-sr-x root/root    173644 2021-08-31 20:33 var/www/html/sh
+      ```
+    
+  - pgp
+    
+    - decrypt
+    
+      ```console
+      ┌─[✗]─[rio@parrot]─[~/Htb/Bolt]
+      └──╼ $gpg --import gpg_priv
+      gpg: key 1C2741A3DC3B4ABD: public key "Eddie Johnson <eddie@bolt.htb>" imported
+      gpg: key 1C2741A3DC3B4ABD: secret key imported
+      gpg: Total number processed: 1
+      gpg:               imported: 1
+      gpg:       secret keys read: 1
+      gpg:   secret keys imported: 1
+      ┌─[rio@parrot]─[~/Htb/Bolt]
+      └──╼ $gpg -d gpg_message
+      gpg: encrypted with 2048-bit RSA key, ID F65CA879A3D77FE4, created 2021-02-25
+            "Eddie Johnson <eddie@bolt.htb>"
+      {"password":"Z(2rmxsNW(Z?3=p/9s","description":""}gpg: Signature made 2021年03月07日 00時33分54秒 JST
+      gpg:                using RSA key 1C2741A3DC3B4ABD
+      gpg: Good signature from "Eddie Johnson <eddie@bolt.htb>" [unknown]
+      gpg: WARNING: This key is not certified with a trusted signature!
+      gpg:          There is no indication that the signature belongs to the owner.
+      Primary key fingerprint: DF42 6BC7 A4A8 AF58 E50E  DA0E 1C27 41A3 DC3B 4ABD
       ```
     
   - vhd
