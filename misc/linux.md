@@ -72,7 +72,35 @@
   uid=0(root) gid=0(root) groups=0(root)
   ```
 
-## Time
+## Timestamp
+### File Timestamp
+* OSに後から追加されたソフトウェアはTimestampが新しくなる傾向がある
+* 更に、手動で追加されたソフトウェアは秒以下のタイムスタンプが０になる傾向がある
+* Htb: Time
+
+  ```console
+  pericles@time:/bin$ ls -la --time-style=full
+  total 114472
+  -rwxrw-rw-  1 pericles pericles       88 2021-10-01 10:30:01.705464997 +0000  timer_backup.sh
+  drwxr-xr-x  2 root     root        36864 2021-02-09 14:42:59.226504740 +0000  .
+  -rwxr-xr-x  1 root     root       273096 2021-01-19 14:21:02.000000000 +0000  cvtsudoers
+  -rwsr-xr-x  1 root     root       166056 2021-01-19 14:21:02.000000000 +0000  sudo
+  lrwxrwxrwx  1 root     root            4 2021-01-19 14:21:02.000000000 +0000  sudoedit -> sudo
+  -rwxr-xr-x  1 root     root        64512 2021-01-19 14:21:02.000000000 +0000  sudoreplay
+  lrwxrwxrwx  1 root     root           23 2020-10-20 12:34:58.201135565 +0000  jexec -> /etc/alternatives/jexec
+  lrwxrwxrwx  1 root     root           21 2020-10-20 12:34:58.201135565 +0000  jfr -> /etc/alternatives/jfr
+  lrwxrwxrwx  1 root     root           27 2020-10-20 12:34:58.197135579 +0000  unpack200 -> /etc/alternatives/unpack200
+  lrwxrwxrwx  1 root     root           29 2020-10-20 12:34:58.193135594 +0000  rmiregistry -> /etc/alternatives/rmiregistry
+  lrwxrwxrwx  1 root     root           21 2020-10-20 12:34:58.189135608 +0000  jjs -> /etc/alternatives/jjs
+  lrwxrwxrwx  1 root     root           25 2020-10-20 12:34:58.189135608 +0000  pack200 -> /etc/alternatives/pack200
+  lrwxrwxrwx  1 root     root           22 2020-10-20 12:34:58.185135622 +0000  java -> /etc/alternatives/java
+  lrwxrwxrwx  1 root     root           25 2020-10-20 12:34:58.185135622 +0000  keytool -> /etc/alternatives/keytool
+  lrwxrwxrwx  1 root     root           22 2020-10-20 12:34:58.181135637 +0000  rmid -> /etc/alternatives/rmid
+  -rwxr-xr-x  1 root     root        14885 2020-10-06 15:47:56.000000000 +0000  phar.phar7.4
+  lrwxrwxrwx  1 root     root           12 2020-10-06 15:47:56.000000000 +0000  phar7.4 -> phar.phar7.4
+  -rwxr-xr-x  1 root     root      4773816 2020-10-06 15:47:56.000000000 +0000  php7.4
+  ```
+### Machine Create Timestamp
 * マシンが作成された時間は、sshのssh_host*.keyから把握できる
 * Htb: TheNoteBook
 
@@ -97,4 +125,6 @@
   www-data@thenotebook:/etc/ssh$ find / -newermt "2021-02-12" ! -newermt "2021-02-19"
   ```
 
-  
+## Sudo
+### Sudo 1.9.5p1 (CVE-2021-3156) Heap-Based Buffer Overflow Privilege Escalation.
+* [exploit](https://github.com/CyberCommands/exploit-sudoedit)
