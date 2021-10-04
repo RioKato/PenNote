@@ -51,5 +51,5 @@
 * userfaultfdでkernelの特定ページへの書き込みを監視することが可能
 
 ### links
-[Kernel Exploitで使える構造体集](https://ptr-yudai.hatenablog.com/entry/2020/03/16/165628)
-[kernelpwn](https://github.com/smallkirby/kernelpwn)
+* [Kernel Exploitで使える構造体集](https://ptr-yudai.hatenablog.com/entry/2020/03/16/165628)
+* [kernelpwn](https://github.com/smallkirby/kernelpwn)
