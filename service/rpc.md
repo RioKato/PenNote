@@ -107,7 +107,7 @@
 * PrintNightmareの可能性が存在するかどうかは、MS-RPRNが動作しているかどうかを調査すればよい
 * [PrintNightmare exploit](https://github.com/cube0x0/CVE-2021-1675)
 * Windows 7 <= Windows 10 21H1 && Windows Server 2008 <= Windows Server 2019
-* 低権限のユーザアカウントを有する時、System権限を取得可能
+* rpcにアクセス可能なユーザアカウントを有する時、System権限を取得可能
 * Htb: Atom
 
   ```console
