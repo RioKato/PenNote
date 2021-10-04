@@ -49,6 +49,10 @@
   
  ### Kernel
 * userfaultfdでkernelの特定ページへの書き込みを監視することが可能
+* modprobe_pathを書き換えることで、任意のスクリプトをrootで実行することが可能
+  * 不明なmagic numberのバイナリをlinuxが実行(sytemcall : execve)しようとすると、前記magic numberと合致するバイナリフォーマットを探索する過程で、call_modprobeが呼ばれる。call_modeprobeは内部で、modeprobe_pathで指定したバイナリを実行する
+  * modprobe_pathは、カーネルオプションによってはkallsymsには表示されないが、call_usermodehelper関数の第一引数をデバッガで調べることで求まる
+* core_patternを書き換えることで、プログラムのクラッシュによるコアダンプの作成をトリガーとして、任意のスクリプトをrootで実行することが可能
 
 ### links
 * [Kernel Exploitで使える構造体集](https://ptr-yudai.hatenablog.com/entry/2020/03/16/165628)
