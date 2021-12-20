@@ -45,6 +45,14 @@
       puts("end");
   }
   ```
+
+* libcの関数を呼び出したのち、スタック上に残留しているアドレスを書き換え、cus gadgetでトリガー
+* libcの関数を呼び出したのち、残留しているレジスタを任意の領域に書き込み、書き換え、トリガー
+* gadgetはmovだけではなくaddなどもmovの代用としてつかえる
+* gadgetはraxだけではなく、eaxなども選択に入れる。aslrは下位4byteが判明すれば、現実的な確率でエクスプロイト可能なため
+* aslrでは上位4byteは8bitほどのエントロピー、下位4byteは20bitほどのエントロピー
+	* libc: 0x00007fxx xxxxxXXX
+	* 下位4byteが推定できれば、上位4byteは1/255の確率であるため現実的
   
  ### Kernel
 * userfaultfdでkernelの特定ページへの書き込みを監視することが可能
