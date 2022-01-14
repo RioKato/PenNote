@@ -59,6 +59,7 @@
 * aslrでは上位4byteは8bitほどのエントロピー、下位4byteは20bitほどのエントロピー
 	* libc: 0x00007fxx xxxxxXXX
 	* 下位4byteが推定できれば、上位4byteは1/255の確率であるため現実的
+* mmapでallocateしたチャンクのアドレスと、他のdynamic libのアドレスの、相対オフセットは固定
   
  ### Kernel
 * userfaultfdでkernelの特定ページへの書き込みを監視することが可能
