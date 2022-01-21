@@ -1,6 +1,12 @@
 # PWN
 
 ---
+## 脆弱性の考え方
+* コードの複雑さ
+* 異常系ではなく、正常系において、あまり通らないパス
+  * よく通るパスに脆弱性はない
+  * 異常系は、プログラマに異常と認識され、フォローされているが故に問題はない
+
 ## Basic
 
 1. 入力値に着目すること
@@ -67,6 +73,10 @@
   * 不明なmagic numberのバイナリをlinuxが実行(sytemcall : execve)しようとすると、前記magic numberと合致するバイナリフォーマットを探索する過程で、call_modprobeが呼ばれる。call_modeprobeは内部で、modeprobe_pathで指定したバイナリを実行する
   * modprobe_pathは、カーネルオプションによってはkallsymsには表示されないが、call_usermodehelper関数の第一引数をデバッガで調べることで求まる
 * core_patternを書き換えることで、プログラムのクラッシュによるコアダンプの作成をトリガーとして、任意のスクリプトをrootで実行することが可能
+* syscallでkernelに入ると、swapgsでgsが交換され、交換されたgsからkernel stackのアドレスが取得され、rspにセットされる。のち、レジスタが対比される
+* kernelではcr4にSMEP, SMAPのフラグが存在する
+* task_structに、ユーザのクレデンシャルへのポインタが存在する。クレデンシャルはUIDなどを含む。UIDを書き換える、もしくはcommit_creds(0)を発行することで、rootになれる
+* thread_structに、seccompのフラグが存在する
 
 ### links
 * [Kernel Exploitで使える構造体集](https://ptr-yudai.hatenablog.com/entry/2020/03/16/165628)
