@@ -16,6 +16,7 @@
   * バグの原因は、プロパティが存在するのに、falseを返したこと
 * 組み合わせを調べる
   * Turbofanの最適化周りのバグ
+* Data構造からソースコードを読む
 
 ## Basic
 
@@ -76,17 +77,17 @@
 	* libc: 0x00007fxx xxxxxXXX
 	* 下位4byteが推定できれば、上位4byteは1/255の確率であるため現実的
 * mmapでallocateしたチャンクのアドレスと、他のdynamic libのアドレスの、相対オフセットは固定
-  
+
  ### Kernel
 * userfaultfdでkernelの特定ページへの書き込みを監視することが可能
-* modprobe_pathを書き換えることで、任意のスクリプトをrootで実行することが可能
-  * 不明なmagic numberのバイナリをlinuxが実行(sytemcall : execve)しようとすると、前記magic numberと合致するバイナリフォーマットを探索する過程で、call_modprobeが呼ばれる。call_modeprobeは内部で、modeprobe_pathで指定したバイナリを実行する
-  * modprobe_pathは、カーネルオプションによってはkallsymsには表示されないが、call_usermodehelper関数の第一引数をデバッガで調べることで求まる
-* core_patternを書き換えることで、プログラムのクラッシュによるコアダンプの作成をトリガーとして、任意のスクリプトをrootで実行することが可能
+* modprobe\_pathを書き換えることで、任意のスクリプトをrootで実行することが可能
+  * 不明なmagic numberのバイナリをlinuxが実行(sytemcall : execve)しようとすると、前記magic numberと合致するバイナリフォーマットを探索する過程で、call\_modprobeが呼ばれる。call\_modeprobeは内部で、modeprobe\_pathで指定したバイナリを実行する
+  * modprobe\_pathは、カーネルオプションによってはkallsymsには表示されないが、call\_usermodehelper関数の第一引数をデバッガで調べることで求まる
+* core\_patternを書き換えることで、プログラムのクラッシュによるコアダンプの作成をトリガーとして、任意のスクリプトをrootで実行することが可能
 * syscallでkernelに入ると、swapgsでgsが交換され、交換されたgsからkernel stackのアドレスが取得され、rspにセットされる。のち、レジスタが対比される
 * kernelではcr4にSMEP, SMAPのフラグが存在する
-* task_structに、ユーザのクレデンシャルへのポインタが存在する。クレデンシャルはUIDなどを含む。UIDを書き換える、もしくはcommit_creds(0)を発行することで、rootになれる
-* thread_structに、seccompのフラグが存在する
+* task\_structに、ユーザのクレデンシャルへのポインタが存在する。クレデンシャルはUIDなどを含む。UIDを書き換える、もしくはcommit\_creds(0)を発行することで、rootになれる
+* thread\_structに、seccompのフラグが存在する
 
 ### links
 * [Kernel Exploitで使える構造体集](https://ptr-yudai.hatenablog.com/entry/2020/03/16/165628)
