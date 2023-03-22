@@ -27,6 +27,12 @@
   ```python
   __import__("os").system('COMMAND')
   ```
+
+* os.path.join
+```python
+os.path.join('/hoo', 'bar', '/baz')
+# => /baz
+```
   
 * [Hacking Python Applications](https://medium.com/swlh/hacking-python-applications-5d4cd541b3f1)
 
