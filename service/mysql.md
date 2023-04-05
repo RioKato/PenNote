@@ -158,6 +158,11 @@
   ') UNION SELECT  0,1,2  INTO OUTFILE '/tmp/test.txt';--
   ```
 
+## MariaDB CVE-2021-27928
+* MySQLのクローンであるMariaDBには権限昇格に利用可能な脆弱性が存在
+* [Exploit](https://github.com/Al1ex/CVE-2021-27928)
+* Htb: Shibboleth
+
 ## SQLI Reference
 ----
 * [mysql udf a penetration test](https://www.programmersought.com/article/84344091741/)
