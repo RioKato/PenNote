@@ -1,5 +1,23 @@
 # Scenario
 ----
+* 実行順序
+
+1. FROM
+1. ON
+1. JOIN
+1. WHERE
+1. GROUP BY
+1. HAVING
+1. SELECT
+1. DISTINCT
+1. ORDER BY
+1. TOP（LIMIT, OFFSET）
+1. UNION
+
+* 考え方
+    * 検索結果が判明しているタイプのアプリと、判明してないタイプのアプリがある
+    * 前者は例えば、検索エンジン、後者はログインシステムにおけるパスワード
+    * 前者の場合、`query`と`query --`の結果が変化しない場合、SQL Injectionが可能
 
 * MySQLへの攻撃シナリオは大別して３つが存在する
    1. **クライアントが攻撃者端末、サーバが被害者端末のケース**
