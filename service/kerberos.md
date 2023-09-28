@@ -753,7 +753,7 @@ C:\Windows\system32>
 
 | tool     | in/out                                                          | attack               |
 | -------- | --------------------------------------------------------------- | -------------------- |
-| ticketer | krbtgt's NTLM -> any user's TGT                                 | golden ticket        |
+| ticketer | krbtgt's NTLM -> any user's TGT, Service HTLM -> Service TGS    | golden ticket        |
 | getST    | user's NTLM / password -> user's TGT -> impersonated user's TGS | deligation           |
 | getTGT   | user's NTLM / password -> user's TGT                            | over the hash        |
 | certipy  | AD CS cert -> user's TGT / NTLM                                 | certificate template |
